@@ -64,7 +64,7 @@
       font-weight: 500;
       margin: 12px 0 0;
     }
-    .side .tagline { max-width: 340px; margin: 16px 0 0; }
+    .side .tagline { max-width: 440px; margin: 16px 0 0; }
     .side .location { margin: 8px 0 0; font-size: 0.875rem; color: var(--dim); }
 
     nav.toc { display: none; margin-top: 64px; }
@@ -244,6 +244,15 @@
       .list:hover .item:not(:hover) { opacity: 0.5; }
     }
 
+    /* Notebooks con pantallas bajas: compacta la columna izquierda */
+    @media (min-width: 1024px) and (max-height: 900px) {
+      .side { padding: 56px 0 40px; overflow-y: auto; }
+      .side h1 { font-size: 2.5rem; }
+      nav.toc { margin-top: 32px; }
+      nav.toc a { padding: 8px 0; }
+      .social { margin-top: 24px; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       * { transition: none !important; }
@@ -270,7 +279,7 @@
       <div>
         <h1>Tomás Jarufe Urzúa</h1>
         <h2>Estudiante de Ingeniería Civil Industrial</h2>
-        <p class="tagline">Ayudante en la Universidad Técnica Federico Santa María. Me interesa usar la inteligencia artificial para optimizar procesos y apoyar la toma de decisiones.</p>
+        <p class="tagline">Ayudante en la Universidad Técnica Federico Santa María. Me interesa usar la inteligencia artificial para optimizar procesos y apoyar la toma de decisiones. También me interesa entender la matemática de forma didáctica e intuitiva, más que mecanizarla, algo en lo que hoy solemos pecar.</p>
         <p class="location">Valparaíso, Chile</p>
 
         <nav class="toc" aria-label="Secciones">
