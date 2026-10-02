@@ -66,6 +66,8 @@
     }
     .side .tagline { max-width: 440px; margin: 16px 0 0; }
     .side .location { margin: 8px 0 0; font-size: 0.875rem; color: var(--dim); }
+    .side .location .mail { color: var(--text); transition: color 0.2s; }
+    .side .location .mail:hover { color: var(--accent); }
 
     nav.toc { display: none; margin-top: 64px; }
     nav.toc ul { list-style: none; padding: 0; margin: 0; }
@@ -280,7 +282,7 @@
         <h1>Tomás Jarufe Urzúa</h1>
         <h2>Estudiante de Ingeniería Civil Industrial</h2>
         <p class="tagline">Ayudante en la Universidad Técnica Federico Santa María. Me interesa usar la inteligencia artificial para optimizar procesos y apoyar la toma de decisiones. Además, me apasiona entender la matemática de forma didáctica e intuitiva, más que mecanizarla, algo en lo que hoy solemos pecar.</p>
-        <p class="location">Valparaíso, Chile</p>
+        <p class="location">Valparaíso, Chile · <a class="mail" href="mailto:tjarufe@usm.cl">tjarufe@usm.cl</a></p>
 
         <nav class="toc" aria-label="Secciones">
           <ul>
@@ -303,6 +305,11 @@
         <li>
           <a href="https://www.instagram.com/tomas.jarufe/" target="_blank" rel="noopener" aria-label="Instagram">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
+          </a>
+        </li>
+        <li>
+          <a href="mailto:tjarufe@usm.cl" aria-label="Correo: tjarufe@usm.cl" title="tjarufe@usm.cl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
           </a>
         </li>
       </ul>
