@@ -460,10 +460,10 @@
 
     // Lista automáticamente los archivos subidos a la carpeta material/.
     // Cada carpeta dentro de material/ aparece como un grupo con el nombre de la carpeta.
+    // Si cambias el nombre del repositorio o la rama publicada, actualiza estos valores.
+    const usuario = 'tomasjarufeurzua-lab';
+    const repo = 'tomasjarufeurzua-lab.github.io';
     const RAMA = 'claude/youthful-mayer-nwoi6w';
-    const enGithubIo = location.hostname.endsWith('.github.io');
-    const usuario = enGithubIo ? location.hostname.split('.')[0] : 'tomasjarufeurzua-lab';
-    const repo = (enGithubIo && location.pathname.split('/')[1]) || 'pagina';
     const caja = document.getElementById('material-list');
 
     // "Mi_archivo - parte-1.pdf" → "Mi archivo — parte 1"
