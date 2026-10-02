@@ -441,17 +441,20 @@
     window.addEventListener('scroll', markActive, { passive: true });
     markActive();
 
-    // Lista automáticamente los archivos subidos a la carpeta material/
-    // (material/apuntes, material/ejercicios y material/otros).
+    // Lista automáticamente los archivos subidos a la carpeta material/.
+    // Cada carpeta dentro de material/ aparece como un grupo con el nombre de la carpeta.
     const RAMA = 'claude/youthful-mayer-nwoi6w';
-    const CATEGORIAS = [['apuntes', 'Apuntes'], ['ejercicios', 'Ejercicios'], ['otros', 'Otro material']];
     const enGithubIo = location.hostname.endsWith('.github.io');
     const usuario = enGithubIo ? location.hostname.split('.')[0] : 'tomasjarufeurzua-lab';
     const repo = (enGithubIo && location.pathname.split('/')[1]) || 'pagina';
     const caja = document.getElementById('material-list');
 
-    function bonito(nombre) {
-      return nombre.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+    // "Mi_archivo - parte-1.pdf" → "Mi archivo — parte 1"
+    function titulo(nombre) {
+      return nombre.replace(/\s+-\s+/g, ' — ').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+    function bonito(archivo) {
+      return titulo(archivo.replace(/\.[^.]+$/, ''));
     }
     function fila(ruta) {
       const partes = ruta.split('/');
@@ -487,45 +490,55 @@
       return li;
     }
 
-    // Pide el contenido de una carpeta (y de sus subcarpetas) a GitHub
-    async function listar(ruta) {
-      const r = await fetch(`https://api.github.com/repos/${usuario}/${repo}/contents/${ruta}?ref=${encodeURIComponent(RAMA)}`);
+    function visible(ruta) {
+      const nombre = ruta.split('/').pop();
+      return !nombre.startsWith('.') && nombre.toLowerCase() !== 'readme.md';
+    }
+
+    // Pide el contenido de una carpeta a GitHub
+    async function contenido(ruta) {
+      const r = await fetch(`https://api.github.com/repos/${usuario}/${repo}/contents/${ruta.split('/').map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(RAMA)}`);
       if (r.status === 404) return [];
       if (!r.ok) throw new Error(r.status);
-      const items = await r.json();
+      return r.json();
+    }
+
+    // Todos los archivos de una carpeta, incluyendo sus subcarpetas
+    async function archivos(ruta) {
       const rutas = [];
-      for (const x of items) {
-        if (x.type === 'dir') rutas.push(...await listar(x.path));
+      for (const x of await contenido(ruta)) {
+        if (x.type === 'dir') rutas.push(...await archivos(x.path));
         else if (x.type === 'file') rutas.push(x.path);
       }
       return rutas;
     }
 
-    Promise.all(CATEGORIAS.map(([carpeta]) => listar('material/' + carpeta)))
-      .then((resultados) => {
-        caja.innerHTML = '';
-        let hayAlgo = false;
-        CATEGORIAS.forEach(([, titulo], i) => {
-          const lista = resultados[i]
-            .filter((ruta) => {
-              const nombre = ruta.split('/').pop();
-              return !nombre.startsWith('.') && nombre.toLowerCase() !== 'readme.md';
-            })
-            .sort((x, y) => x.localeCompare(y, 'es', { numeric: true }));
-          if (!lista.length) return;
-          hayAlgo = true;
-          const h = document.createElement('h3');
-          h.textContent = titulo;
-          const ul = document.createElement('ul');
-          ul.className = 'files';
-          lista.forEach((ruta) => ul.appendChild(fila(ruta)));
-          caja.append(h, ul);
-        });
-        if (!hayAlgo) caja.innerHTML = '<p class="muted">Pronto subiré material aquí.</p>';
-      })
-      .catch(() => {
-        caja.innerHTML = '<p class="muted">No se pudo cargar el material. Intenta recargar la página en unos minutos.</p>';
-      });
+    function grupo(titulo, lista) {
+      lista = lista.filter(visible).sort((x, y) => x.localeCompare(y, 'es', { numeric: true }));
+      if (!lista.length) return false;
+      const h = document.createElement('h3');
+      h.textContent = titulo;
+      const ul = document.createElement('ul');
+      ul.className = 'files';
+      lista.forEach((ruta) => ul.appendChild(fila(ruta)));
+      caja.append(h, ul);
+      return true;
+    }
+
+    (async () => {
+      const raiz = await contenido('material');
+      const carpetas = raiz.filter((x) => x.type === 'dir')
+        .sort((x, y) => x.name.localeCompare(y.name, 'es', { numeric: true }));
+      const sueltos = raiz.filter((x) => x.type === 'file').map((x) => x.path);
+      const listas = await Promise.all(carpetas.map((c) => archivos(c.path)));
+      caja.innerHTML = '';
+      let hayAlgo = false;
+      carpetas.forEach((c, i) => { if (grupo(titulo(c.name), listas[i])) hayAlgo = true; });
+      if (grupo('Otro material', sueltos)) hayAlgo = true;
+      if (!hayAlgo) caja.innerHTML = '<p class="muted">Pronto subiré material aquí.</p>';
+    })().catch(() => {
+      caja.innerHTML = '<p class="muted">No se pudo cargar el material. Intenta recargar la página en unos minutos.</p>';
+    });
   </script>
 </body>
 </html>
