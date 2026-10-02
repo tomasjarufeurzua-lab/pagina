@@ -194,6 +194,46 @@
     .cta span { transition: transform 0.2s; }
     .cta:hover span { transform: translateX(4px); }
 
+    .reading { margin-top: 40px; }
+    .reading h3 {
+      color: var(--heading);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+    }
+    .books { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .book {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 12px;
+      background: rgba(30, 41, 59, 0.35);
+    }
+    .book .cover {
+      flex-shrink: 0;
+      width: 44px;
+      height: 60px;
+      border-radius: 4px 8px 8px 4px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(45, 212, 191, 0.3), rgba(45, 212, 191, 0.08));
+      border-left: 3px solid var(--accent);
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      font-weight: 700;
+    }
+    .book p { margin: 0; }
+    .book .book-title { color: var(--heading); font-weight: 600; font-style: italic; }
+    .book .book-author { font-size: 0.85rem; color: var(--dim); margin-top: 2px; }
+    .book .book-note { font-size: 0.85rem; margin-top: 8px; }
+    @media (min-width: 640px) { .books { grid-template-columns: 1fr 1fr; } }
+
     a.inline { color: var(--heading); border-bottom: 1px solid var(--dim); transition: all 0.2s; }
     a.inline:hover { color: var(--accent); border-color: var(--accent); }
     .muted { color: var(--dim); font-size: 0.9rem; }
@@ -311,6 +351,7 @@
       .sec-title { position: static; width: auto; height: auto; clip: auto; overflow: visible; background: none; margin: 0 0 8px; padding: 0; border-bottom: 1px solid #ccc; }
       main section { margin-bottom: 24px; }
       .item { margin: 0 0 12px; padding: 0; break-inside: avoid; }
+      .reading { display: none; }
     }
   </style>
 </head>
@@ -366,6 +407,28 @@
         <p>Tengo experiencia en <strong>inteligencia artificial</strong> y me interesa aplicarla para optimizar procesos y apoyar la toma de decisiones.</p>
         <p>Hablo <strong>francés a nivel nativo</strong>, tras completar el Bac del sistema francés, e inglés a nivel intermedio.</p>
         <p>Estoy abierto a prácticas, proyectos y conexiones en IA, datos e ingeniería industrial.</p>
+
+        <div class="reading">
+          <h3>Leyendo ahora</h3>
+          <ul class="books">
+            <li class="book">
+              <div class="cover" aria-hidden="true">x</div>
+              <div>
+                <p class="book-title">The Joy of x</p>
+                <p class="book-author">Steven Strogatz</p>
+                <p class="book-note">Un recorrido por las grandes ideas de la matemática, de los números al infinito, contadas de forma intuitiva.</p>
+              </div>
+            </li>
+            <li class="book">
+              <div class="cover" aria-hidden="true">N</div>
+              <div>
+                <p class="book-title">Nexus</p>
+                <p class="book-author">Yuval Noah Harari</p>
+                <p class="book-note">Una historia de las redes de información, desde la Edad de Piedra hasta la inteligencia artificial.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section id="experiencia">
