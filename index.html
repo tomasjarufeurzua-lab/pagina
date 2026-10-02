@@ -317,6 +317,9 @@
     .files .arrow { color: var(--dim); transition: transform 0.2s; }
     .files a:hover .arrow { transform: translateY(2px); color: var(--accent); }
 
+    /* Íconos repetidos al final: solo en celular y tablet, donde los de arriba quedan lejos */
+    .footer-social { margin-top: 16px; }
+
     footer { font-size: 0.85rem; color: var(--dim); max-width: 420px; padding-bottom: 32px; }
 
     @media (min-width: 768px) {
@@ -345,6 +348,7 @@
       }
       nav.toc { display: block; }
       .go-mobile { display: none; }
+      .footer-social { display: none; }
       .go-desktop { display: inline-flex; margin: 24px 0 0; }
       main { width: 52%; padding: 96px 0; }
       .sec-title {
@@ -564,6 +568,23 @@
 
       <footer>
         <p>Hecho con HTML y CSS.</p>
+        <ul class="social footer-social" aria-label="Redes">
+          <li>
+            <a href="https://www.linkedin.com/in/tomas-jarufe-urzua-916941420/" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.instagram.com/tomas.jarufe/" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="mailto:tjarufe@usm.cl" aria-label="Correo: tjarufe@usm.cl" title="tjarufe@usm.cl">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+            </a>
+          </li>
+        </ul>
       </footer>
     </main>
   </div>
