@@ -191,7 +191,17 @@
     .files a:hover { background: var(--card-hover); }
     .files .name { flex: 1; color: var(--heading); min-width: 0; overflow-wrap: anywhere; }
     .files a:hover .name { color: var(--accent); }
-    .files .sub { display: block; font-size: 0.75rem; color: var(--dim); }
+    .subgroup {
+      margin: 12px 0 0;
+      padding-left: 16px;
+      border-left: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .subgroup h4 {
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 8px 0 4px;
+    }
     .files .ext {
       background: var(--accent-bg);
       color: var(--accent);
@@ -466,7 +476,6 @@
     function fila(ruta) {
       const partes = ruta.split('/');
       const archivo = partes[partes.length - 1];
-      const sub = partes.slice(2, -1).join(' / ');
       const ext = archivo.includes('.') ? archivo.split('.').pop().toUpperCase() : '';
       const li = document.createElement('li');
       const a = document.createElement('a');
@@ -476,12 +485,6 @@
       const nombre = document.createElement('span');
       nombre.className = 'name';
       nombre.textContent = bonito(archivo);
-      if (sub) {
-        const s = document.createElement('span');
-        s.className = 'sub';
-        s.textContent = sub;
-        nombre.appendChild(s);
-      }
       a.appendChild(nombre);
       if (ext) {
         const e = document.createElement('span');
@@ -520,15 +523,45 @@
       return rutas;
     }
 
-    function grupo(titulo, lista) {
-      lista = lista.filter(visible).sort((x, y) => x.localeCompare(y, 'es', { numeric: true }));
-      if (!lista.length) return false;
-      const h = document.createElement('h3');
-      h.textContent = titulo;
+    function ordenar(lista) {
+      const n = (ruta) => bonito(ruta.split('/').pop());
+      return lista.sort((x, y) => n(x).localeCompare(n(y), 'es', { numeric: true }));
+    }
+
+    function listaArchivos(rutas) {
       const ul = document.createElement('ul');
       ul.className = 'files';
-      lista.forEach((ruta) => ul.appendChild(fila(ruta)));
-      caja.append(h, ul);
+      ordenar(rutas).forEach((ruta) => ul.appendChild(fila(ruta)));
+      return ul;
+    }
+
+    // Un grupo por carpeta. Los archivos sueltos van primero y cada
+    // subcarpeta aparece como un subtítulo con sus propios archivos.
+    function grupo(nombre, carpeta, lista) {
+      lista = lista.filter(visible);
+      if (!lista.length) return false;
+      const nivel = carpeta ? carpeta.split('/').length : 1;
+      const directos = [];
+      const subcarpetas = new Map();
+      for (const ruta of lista) {
+        const partes = ruta.split('/');
+        if (partes.length === nivel + 1) { directos.push(ruta); continue; }
+        const sub = partes.slice(nivel, -1).map(titulo).join(' / ');
+        if (!subcarpetas.has(sub)) subcarpetas.set(sub, []);
+        subcarpetas.get(sub).push(ruta);
+      }
+      const h = document.createElement('h3');
+      h.textContent = nombre;
+      caja.appendChild(h);
+      if (directos.length) caja.appendChild(listaArchivos(directos));
+      [...subcarpetas.keys()].sort((x, y) => x.localeCompare(y, 'es', { numeric: true })).forEach((sub) => {
+        const bloque = document.createElement('div');
+        bloque.className = 'subgroup';
+        const h4 = document.createElement('h4');
+        h4.textContent = sub;
+        bloque.append(h4, listaArchivos(subcarpetas.get(sub)));
+        caja.appendChild(bloque);
+      });
       return true;
     }
 
@@ -540,8 +573,8 @@
       const listas = await Promise.all(carpetas.map((c) => archivos(c.path)));
       caja.innerHTML = '';
       let hayAlgo = false;
-      carpetas.forEach((c, i) => { if (grupo(titulo(c.name), listas[i])) hayAlgo = true; });
-      if (grupo('Otro material', sueltos)) hayAlgo = true;
+      carpetas.forEach((c, i) => { if (grupo(titulo(c.name), c.path, listas[i])) hayAlgo = true; });
+      if (grupo('Otro material', '', sueltos)) hayAlgo = true;
       if (!hayAlgo) caja.innerHTML = '<p class="muted">Pronto subiré material aquí.</p>';
     })().catch(() => {
       caja.innerHTML = '<p class="muted">No se pudo cargar el material. Intenta recargar la página en unos minutos.</p>';
