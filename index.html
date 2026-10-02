@@ -231,7 +231,7 @@
       font-weight: 700;
       box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.6);
     }
-    /* La foto de la portada tapa la portada de respaldo; si no carga, se elimina */
+    /* La foto de la portada tapa la portada de respaldo; si ninguna fuente carga, se elimina */
     .book .cover img {
       position: absolute;
       inset: 0;
@@ -423,7 +423,7 @@
           <h3>Leyendo ahora</h3>
           <ul class="books">
             <li class="book">
-              <div class="cover"><span aria-hidden="true">x</span><img src="https://covers.openlibrary.org/b/isbn/9780547517650-M.jpg?default=false" alt="Portada de The Joy of x" loading="lazy" onerror="this.remove()"></div>
+              <div class="cover"><span aria-hidden="true">x</span><img alt="Portada de The Joy of x" data-portadas="https://covers.openlibrary.org/b/isbn/9780544105850-M.jpg?default=false https://covers.openlibrary.org/b/olid/OL25355390M-M.jpg?default=false https://covers.openlibrary.org/b/isbn/9780547517650-M.jpg?default=false https://images-na.ssl-images-amazon.com/images/P/0544105850.01.L.jpg https://images-na.ssl-images-amazon.com/images/P/0547517653.01.L.jpg"></div>
               <div>
                 <p class="book-title">The Joy of x</p>
                 <p class="book-author">Steven Strogatz</p>
@@ -431,7 +431,7 @@
               </div>
             </li>
             <li class="book">
-              <div class="cover"><span aria-hidden="true">N</span><img src="https://covers.openlibrary.org/b/isbn/9780593734223-M.jpg?default=false" alt="Portada de Nexus" loading="lazy" onerror="this.remove()"></div>
+              <div class="cover"><span aria-hidden="true">N</span><img alt="Portada de Nexus" data-portadas="https://covers.openlibrary.org/b/isbn/9780593734223-M.jpg?default=false https://images-na.ssl-images-amazon.com/images/P/059373422X.01.L.jpg"></div>
               <div>
                 <p class="book-title">Nexus</p>
                 <p class="book-author">Yuval Noah Harari</p>
@@ -544,6 +544,20 @@
   </div>
 
   <script>
+    // Portadas de libros: prueba cada fuente en orden hasta que una funcione.
+    // Si ninguna carga, se queda la portada de respaldo.
+    document.querySelectorAll('img[data-portadas]').forEach((img) => {
+      const fuentes = img.dataset.portadas.split(' ');
+      const siguiente = () => {
+        if (fuentes.length) img.src = fuentes.shift();
+        else img.remove();
+      };
+      img.addEventListener('error', siguiente);
+      // Algunos sitios responden con una imagen vacía de 1x1 cuando no tienen la portada
+      img.addEventListener('load', () => { if (img.naturalWidth < 20) siguiente(); });
+      siguiente();
+    });
+
     // Luz que sigue al mouse
     const spot = document.getElementById('spotlight');
     window.addEventListener('pointermove', (e) => {
