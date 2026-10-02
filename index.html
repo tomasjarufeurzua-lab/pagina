@@ -3,125 +3,355 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tomás · Página personal</title>
-  <meta name="description" content="Página personal de Tomás">
+  <title>Tomás Jarufe Urzúa</title>
+  <meta name="description" content="Currículum y perfil profesional de Tomás Jarufe Urzúa">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #fafaf9;
-      --surface: #ffffff;
-      --text: #1c1917;
-      --muted: #57534e;
-      --border: #e7e5e4;
-      --accent: #2563eb;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0c0a09;
-        --surface: #1c1917;
-        --text: #f5f5f4;
-        --muted: #a8a29e;
-        --border: #292524;
-        --accent: #60a5fa;
-      }
+      --bg: #0f172a;
+      --text: #94a3b8;
+      --heading: #e2e8f0;
+      --dim: #64748b;
+      --accent: #5eead4;
+      --accent-bg: rgba(45, 212, 191, 0.1);
+      --card-hover: rgba(30, 41, 59, 0.5);
+      --spot: rgba(29, 78, 216, 0.15);
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
       font-family: "Inter", system-ui, sans-serif;
-      line-height: 1.6;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
     }
-    main {
-      max-width: 720px;
+    ::selection { background: #2dd4bf; color: #134e4a; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Luz que sigue al mouse */
+    .spotlight {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      transition: background 0.3s;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 64px 16px;
+      padding: 48px 24px;
     }
-    header { margin-bottom: 48px; }
-    .avatar {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 36px;
+
+    /* Columna izquierda */
+    .side h1 {
+      color: var(--heading);
+      font-size: 2.5rem;
       font-weight: 700;
-      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
     }
-    h1 { font-size: 2.25rem; margin: 0 0 8px; line-height: 1.2; }
-    .tagline { color: var(--muted); font-size: 1.125rem; margin: 0; }
-    section { margin-bottom: 40px; }
-    h2 {
-      font-size: 0.85rem;
+    .side h2 {
+      color: var(--heading);
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin: 12px 0 0;
+    }
+    .side .tagline { max-width: 320px; margin: 16px 0 0; }
+
+    nav.toc { display: none; margin-top: 64px; }
+    nav.toc ul { list-style: none; padding: 0; margin: 0; }
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin: 0 0 16px;
+      color: var(--dim);
     }
-    .cards { display: grid; gap: 12px; }
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 20px;
+    nav.toc .line {
+      height: 1px;
+      width: 32px;
+      background: var(--dim);
+      transition: all 0.2s;
     }
-    .card h3 { margin: 0 0 4px; font-size: 1rem; }
-    .card p { margin: 0; color: var(--muted); }
-    .links { display: flex; flex-wrap: wrap; gap: 12px; }
-    .links a {
+    nav.toc a:hover, nav.toc a.active { color: var(--heading); }
+    nav.toc a:hover .line, nav.toc a.active .line { width: 64px; background: var(--heading); }
+
+    .social { display: flex; gap: 20px; margin-top: 32px; list-style: none; padding: 0; }
+    .social a { color: var(--text); transition: color 0.2s; display: block; }
+    .social a:hover { color: var(--heading); }
+    .social svg { width: 24px; height: 24px; display: block; }
+
+    /* Columna derecha */
+    main section { margin-bottom: 96px; scroll-margin-top: 96px; }
+    .sec-title {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      margin: 0 -24px 24px;
+      padding: 20px 24px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      color: var(--heading);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    main p { margin: 0 0 16px; }
+    main strong { color: var(--heading); font-weight: 500; }
+
+    .list { list-style: none; padding: 0; margin: 0; }
+    .item {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      padding: 16px 0;
+      margin-bottom: 32px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .item .date {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: 4px;
+    }
+    .item h3 {
+      color: var(--heading);
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.4;
+      margin: 0;
+    }
+    .item h3 .org { color: var(--text); }
+    .item:hover h3 { color: var(--accent); }
+    .item p { font-size: 0.9rem; margin: 8px 0 0; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 12px 0 0; }
+    .tags li {
+      background: var(--accent-bg);
       color: var(--accent);
-      text-decoration: none;
-      border: 1px solid var(--border);
       border-radius: 999px;
-      padding: 6px 16px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
       font-weight: 500;
     }
-    .links a:hover { border-color: var(--accent); }
-    footer { color: var(--muted); font-size: 0.875rem; margin-top: 64px; }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--heading);
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .cta:hover { color: var(--accent); }
+    .cta span { transition: transform 0.2s; }
+    .cta:hover span { transform: translateX(4px); }
+
+    footer { font-size: 0.85rem; color: var(--dim); max-width: 420px; padding-bottom: 32px; }
+
+    @media (min-width: 768px) {
+      .wrap { padding: 80px 48px; }
+      .sec-title { margin: 0 -48px 24px; padding: 20px 48px; }
+      .side h1 { font-size: 3rem; }
+      .item { grid-template-columns: 2fr 6fr; gap: 24px; }
+    }
+
+    @media (min-width: 1024px) {
+      .wrap {
+        display: flex;
+        justify-content: space-between;
+        gap: 64px;
+        padding: 0 96px;
+      }
+      .side {
+        position: sticky;
+        top: 0;
+        width: 48%;
+        max-height: 100vh;
+        padding: 96px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      nav.toc { display: block; }
+      main { width: 52%; padding: 96px 0; }
+      .sec-title {
+        position: absolute;
+        width: 1px; height: 1px; overflow: hidden;
+        clip: rect(0 0 0 0); white-space: nowrap;
+        margin: 0; padding: 0;
+      }
+      main section { margin-bottom: 144px; }
+      .item { padding: 16px 24px; margin: 0 -24px 32px; }
+      .item:hover {
+        background: var(--card-hover);
+        box-shadow: inset 0 1px 0 0 rgba(148, 163, 184, 0.1);
+      }
+      .list:hover .item:not(:hover) { opacity: 0.5; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+
+    /* Al imprimir sale como un CV en blanco y negro */
+    @media print {
+      :root { --bg: #fff; --text: #333; --heading: #000; --dim: #555; --accent: #000; --accent-bg: #eee; }
+      .spotlight, nav.toc, .social, .cta, footer { display: none !important; }
+      .wrap { display: block; padding: 0; }
+      .side, main { width: auto; position: static; padding: 0; max-height: none; }
+      .side { margin-bottom: 24px; }
+      .sec-title { position: static; width: auto; height: auto; clip: auto; overflow: visible; background: none; margin: 0 0 8px; padding: 0; border-bottom: 1px solid #ccc; }
+      main section { margin-bottom: 24px; }
+      .item { margin: 0 0 12px; padding: 0; break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
-  <main>
-    <header>
-      <div class="avatar" aria-hidden="true">T</div>
-      <h1>Hola, soy Tomás</h1>
-      <p class="tagline">[Una frase sobre ti: qué estudias o a qué te dedicas]</p>
+  <div class="spotlight" id="spotlight"></div>
+
+  <div class="wrap">
+    <header class="side">
+      <div>
+        <h1>Tomás Jarufe Urzúa</h1>
+        <h2>[Tu título: ej. Estudiante de Ingeniería]</h2>
+        <p class="tagline">[Una frase corta sobre lo que haces o lo que te interesa.]</p>
+
+        <nav class="toc" aria-label="Secciones">
+          <ul>
+            <li><a href="#sobre-mi" class="active"><span class="line"></span>Sobre mí</a></li>
+            <li><a href="#experiencia"><span class="line"></span>Experiencia</a></li>
+            <li><a href="#educacion"><span class="line"></span>Educación</a></li>
+            <li><a href="#habilidades"><span class="line"></span>Habilidades</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <ul class="social" aria-label="Redes">
+        <li>
+          <a href="https://www.linkedin.com/in/tomas-jarufe-urzua-916941420/" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/tomasjarufeurzua-lab" target="_blank" rel="noopener" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3"/></svg>
+          </a>
+        </li>
+        <li>
+          <a href="mailto:[tu-correo]" aria-label="Correo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          </a>
+        </li>
+      </ul>
     </header>
 
-    <section>
-      <h2>Sobre mí</h2>
-      <p>[Escribe aquí un párrafo corto presentándote: de dónde eres, qué te interesa y qué estás haciendo ahora.]</p>
-    </section>
+    <main>
+      <section id="sobre-mi">
+        <h2 class="sec-title">Sobre mí</h2>
+        <p>[Párrafo 1: quién eres, qué estudias o en qué trabajas, y desde dónde.]</p>
+        <p>[Párrafo 2: qué te motiva, en qué te estás especializando o qué tipo de oportunidades buscas.]</p>
+        <p>[Párrafo 3 (opcional): algo personal, como hobbies o deportes.]</p>
+      </section>
 
-    <section>
-      <h2>Proyectos e intereses</h2>
-      <div class="cards">
-        <div class="card">
-          <h3>[Proyecto o interés 1]</h3>
-          <p>[Descripción breve]</p>
-        </div>
-        <div class="card">
-          <h3>[Proyecto o interés 2]</h3>
-          <p>[Descripción breve]</p>
-        </div>
-      </div>
-    </section>
+      <section id="experiencia">
+        <h2 class="sec-title">Experiencia</h2>
+        <ol class="list">
+          <li class="item">
+            <div class="date">[2025 — Presente]</div>
+            <div>
+              <h3>[Cargo] · <span class="org">[Empresa]</span></h3>
+              <p>[Qué hiciste y qué lograste en este puesto, en 1 o 2 frases.]</p>
+              <ul class="tags"><li>[Habilidad]</li><li>[Habilidad]</li><li>[Habilidad]</li></ul>
+            </div>
+          </li>
+          <li class="item">
+            <div class="date">[2024 — 2025]</div>
+            <div>
+              <h3>[Cargo] · <span class="org">[Empresa]</span></h3>
+              <p>[Qué hiciste y qué lograste en este puesto, en 1 o 2 frases.]</p>
+              <ul class="tags"><li>[Habilidad]</li><li>[Habilidad]</li></ul>
+            </div>
+          </li>
+        </ol>
+      </section>
 
-    <section>
-      <h2>Contacto</h2>
-      <div class="links">
-        <a href="https://github.com/tomasjarufeurzua-lab">GitHub</a>
-        <a href="#">[LinkedIn / Instagram]</a>
-        <a href="#">[Correo]</a>
-      </div>
-    </section>
+      <section id="educacion">
+        <h2 class="sec-title">Educación</h2>
+        <ol class="list">
+          <li class="item">
+            <div class="date">[2023 — Presente]</div>
+            <div>
+              <h3>[Carrera] · <span class="org">[Universidad]</span></h3>
+              <p>[Detalles: especialidad, logros, ayudantías, promedio, etc.]</p>
+            </div>
+          </li>
+          <li class="item">
+            <div class="date">[20XX — 20XX]</div>
+            <div>
+              <h3>Enseñanza Media · <span class="org">[Colegio]</span></h3>
+              <p>[Opcional: logros destacados.]</p>
+            </div>
+          </li>
+        </ol>
+      </section>
 
-    <footer>© 2026 Tomás</footer>
-  </main>
+      <section id="habilidades">
+        <h2 class="sec-title">Habilidades</h2>
+        <p><strong>Técnicas</strong></p>
+        <ul class="tags"><li>[Excel]</li><li>[Python]</li><li>[Otra]</li></ul>
+        <p style="margin-top:24px"><strong>Idiomas</strong></p>
+        <ul class="tags"><li>Español (nativo)</li><li>[Inglés (nivel)]</li></ul>
+        <a class="cta" href="https://www.linkedin.com/in/tomas-jarufe-urzua-916941420/" target="_blank" rel="noopener" style="margin-top:32px">
+          Ver perfil completo en LinkedIn <span>→</span>
+        </a>
+      </section>
+
+      <footer>
+        <p>Diseño inspirado en el portafolio de Brittany Chiang. Hecho con HTML y CSS, publicado con GitHub Pages.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Luz que sigue al mouse
+    const spot = document.getElementById('spotlight');
+    window.addEventListener('pointermove', (e) => {
+      spot.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, var(--spot), transparent 80%)`;
+    });
+
+    // Marca en el menú la sección que se está viendo
+    const links = document.querySelectorAll('nav.toc a');
+    const sections = [...document.querySelectorAll('main section')];
+    function markActive() {
+      let current = sections[0];
+      for (const s of sections) {
+        if (s.getBoundingClientRect().top <= window.innerHeight * 0.3) current = s;
+      }
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 2) {
+        current = sections[sections.length - 1];
+      }
+      links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + current.id));
+    }
+    window.addEventListener('scroll', markActive, { passive: true });
+    markActive();
+  </script>
 </body>
 </html>
