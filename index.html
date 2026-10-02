@@ -19,6 +19,8 @@
   <meta property="og:image:alt" content="Tomás Jarufe Urzúa, estudiante de Ingeniería Civil Industrial en la USM">
   <meta property="og:locale" content="es_CL">
   <meta name="twitter:card" content="summary_large_image">
+  <!-- Estadísticas de visitas (GoatCounter: sin cookies, no guarda IPs) -->
+  <script data-goatcounter="https://tomasjarufe.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -636,6 +638,12 @@
       a.href = ruta.split('/').map(encodeURIComponent).join('/');
       a.target = '_blank';
       a.rel = 'noopener';
+      // Cuenta la descarga en GoatCounter (aparece como evento en el panel)
+      a.addEventListener('click', () => {
+        if (window.goatcounter && window.goatcounter.count) {
+          window.goatcounter.count({ path: 'descarga/' + ruta.replace(/^material\//, ''), title: bonito(archivo), event: true });
+        }
+      });
       const nombre = document.createElement('span');
       nombre.className = 'name';
       nombre.textContent = bonito(archivo);
