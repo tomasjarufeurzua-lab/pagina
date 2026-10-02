@@ -164,6 +164,43 @@
     .cta span { transition: transform 0.2s; }
     .cta:hover span { transform: translateX(4px); }
 
+    a.inline { color: var(--heading); border-bottom: 1px solid var(--dim); transition: all 0.2s; }
+    a.inline:hover { color: var(--accent); border-color: var(--accent); }
+    .muted { color: var(--dim); font-size: 0.9rem; }
+
+    .material h3 {
+      color: var(--heading);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 32px 0 8px;
+    }
+    .files { list-style: none; padding: 0; margin: 0; }
+    .files a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      margin: 0 -16px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .files a:hover { background: var(--card-hover); }
+    .files .name { flex: 1; color: var(--heading); min-width: 0; overflow-wrap: anywhere; }
+    .files a:hover .name { color: var(--accent); }
+    .files .sub { display: block; font-size: 0.75rem; color: var(--dim); }
+    .files .ext {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .files .arrow { color: var(--dim); transition: transform 0.2s; }
+    .files a:hover .arrow { transform: translateY(2px); color: var(--accent); }
+
     footer { font-size: 0.85rem; color: var(--dim); max-width: 420px; padding-bottom: 32px; }
 
     @media (min-width: 768px) {
@@ -215,7 +252,7 @@
     /* Al imprimir sale como un CV en blanco y negro */
     @media print {
       :root { --bg: #fff; --text: #333; --heading: #000; --dim: #555; --accent: #000; --accent-bg: #eee; }
-      .spotlight, nav.toc, .social, .cta, footer { display: none !important; }
+      .spotlight, nav.toc, .social, .cta, footer, #material { display: none !important; }
       .wrap { display: block; padding: 0; }
       .side, main { width: auto; position: static; padding: 0; max-height: none; }
       .side { margin-bottom: 24px; }
@@ -242,8 +279,8 @@
             <li><a href="#experiencia"><span class="line"></span>Experiencia</a></li>
             <li><a href="#educacion"><span class="line"></span>Educación</a></li>
             <li><a href="#logros"><span class="line"></span>Logros</a></li>
-            <li><a href="#certificaciones"><span class="line"></span>Certificaciones</a></li>
             <li><a href="#habilidades"><span class="line"></span>Habilidades</a></li>
+            <li><a href="#material"><span class="line"></span>Material</a></li>
           </ul>
         </nav>
       </div>
@@ -255,8 +292,8 @@
           </a>
         </li>
         <li>
-          <a href="https://github.com/tomasjarufeurzua-lab" target="_blank" rel="noopener" aria-label="GitHub">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3"/></svg>
+          <a href="https://www.instagram.com/tomas.jarufe/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
           </a>
         </li>
       </ul>
@@ -277,8 +314,8 @@
           <li class="item">
             <div class="date">Sept 2026 — Presente</div>
             <div>
-              <h3>Ayudante, Departamento de Matemática · <span class="org">Universidad Técnica Federico Santa María</span></h3>
-              <p>Presencial · Valparaíso, Chile</p>
+              <h3>Ayudante de Álgebra Lineal, Departamento de Matemática · <span class="org">Universidad Técnica Federico Santa María</span></h3>
+              <p>Ayudantía del ramo de Álgebra Lineal. Presencial · Valparaíso, Chile</p>
               <ul class="tags"><li>Fluidez de IA</li><li>Educación matemática</li></ul>
             </div>
           </li>
@@ -336,26 +373,14 @@
               <p>Nota perfecta en las pruebas del sistema francés de acceso a la educación superior.</p>
             </div>
           </li>
-        </ol>
-      </section>
-
-      <section id="certificaciones">
-        <h2 class="sec-title">Certificaciones</h2>
-        <ol class="list">
           <li class="item">
             <div class="date">Sept 2026</div>
             <div>
-              <h3><a href="https://academy.claude.com/verify/88d653856b2e658152f0895335457a28" target="_blank" rel="noopener">Building effective human-agent teams ↗</a> · <span class="org">Anthropic</span></h3>
-              <p>Claude Academy</p>
-              <ul class="tags"><li>Fluidez de IA</li></ul>
-            </div>
-          </li>
-          <li class="item">
-            <div class="date">Sept 2026</div>
-            <div>
-              <h3><a href="https://academy.claude.com/verify/0a0af8972860b60601cacb50dad9900f" target="_blank" rel="noopener">AI Fluency for educators ↗</a> · <span class="org">Anthropic</span></h3>
-              <p>Claude Academy</p>
-              <ul class="tags"><li>Fluidez de IA</li></ul>
+              <h3>Certificaciones en Fluidez de IA · <span class="org">Anthropic</span></h3>
+              <p>Tres cursos de Claude Academy:
+                <a class="inline" href="https://academy.claude.com/verify/e591917eda5fdc5fac61221e5c027bfd" target="_blank" rel="noopener">AI Fluency: Framework and foundations</a>,
+                <a class="inline" href="https://academy.claude.com/verify/0a0af8972860b60601cacb50dad9900f" target="_blank" rel="noopener">AI Fluency for educators</a> y
+                <a class="inline" href="https://academy.claude.com/verify/88d653856b2e658152f0895335457a28" target="_blank" rel="noopener">Building effective human-agent teams</a>.</p>
             </div>
           </li>
         </ol>
@@ -370,6 +395,12 @@
         <a class="cta" href="https://www.linkedin.com/in/tomas-jarufe-urzua-916941420/" target="_blank" rel="noopener" style="margin-top:32px">
           Ver perfil completo en LinkedIn <span>→</span>
         </a>
+      </section>
+
+      <section id="material">
+        <h2 class="sec-title">Material</h2>
+        <p>Apuntes, ejercicios y otro material de estudio que he preparado. Puedes descargarlos libremente.</p>
+        <div id="material-list" class="material"><p class="muted">Cargando material…</p></div>
       </section>
 
       <footer>
@@ -400,6 +431,92 @@
     }
     window.addEventListener('scroll', markActive, { passive: true });
     markActive();
+
+    // Lista automáticamente los archivos subidos a la carpeta material/
+    // (material/apuntes, material/ejercicios y material/otros).
+    const RAMA = 'claude/youthful-mayer-nwoi6w';
+    const CATEGORIAS = [['apuntes', 'Apuntes'], ['ejercicios', 'Ejercicios'], ['otros', 'Otro material']];
+    const enGithubIo = location.hostname.endsWith('.github.io');
+    const usuario = enGithubIo ? location.hostname.split('.')[0] : 'tomasjarufeurzua-lab';
+    const repo = (enGithubIo && location.pathname.split('/')[1]) || 'pagina';
+    const caja = document.getElementById('material-list');
+
+    function bonito(nombre) {
+      return nombre.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+    }
+    function fila(ruta) {
+      const partes = ruta.split('/');
+      const archivo = partes[partes.length - 1];
+      const sub = partes.slice(2, -1).join(' / ');
+      const ext = archivo.includes('.') ? archivo.split('.').pop().toUpperCase() : '';
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = ruta.split('/').map(encodeURIComponent).join('/');
+      a.target = '_blank';
+      a.rel = 'noopener';
+      const nombre = document.createElement('span');
+      nombre.className = 'name';
+      nombre.textContent = bonito(archivo);
+      if (sub) {
+        const s = document.createElement('span');
+        s.className = 'sub';
+        s.textContent = sub;
+        nombre.appendChild(s);
+      }
+      a.appendChild(nombre);
+      if (ext) {
+        const e = document.createElement('span');
+        e.className = 'ext';
+        e.textContent = ext;
+        a.appendChild(e);
+      }
+      const flecha = document.createElement('span');
+      flecha.className = 'arrow';
+      flecha.textContent = '↓';
+      a.appendChild(flecha);
+      li.appendChild(a);
+      return li;
+    }
+
+    // Pide el contenido de una carpeta (y de sus subcarpetas) a GitHub
+    async function listar(ruta) {
+      const r = await fetch(`https://api.github.com/repos/${usuario}/${repo}/contents/${ruta}?ref=${encodeURIComponent(RAMA)}`);
+      if (r.status === 404) return [];
+      if (!r.ok) throw new Error(r.status);
+      const items = await r.json();
+      const rutas = [];
+      for (const x of items) {
+        if (x.type === 'dir') rutas.push(...await listar(x.path));
+        else if (x.type === 'file') rutas.push(x.path);
+      }
+      return rutas;
+    }
+
+    Promise.all(CATEGORIAS.map(([carpeta]) => listar('material/' + carpeta)))
+      .then((resultados) => {
+        caja.innerHTML = '';
+        let hayAlgo = false;
+        CATEGORIAS.forEach(([, titulo], i) => {
+          const lista = resultados[i]
+            .filter((ruta) => {
+              const nombre = ruta.split('/').pop();
+              return !nombre.startsWith('.') && nombre.toLowerCase() !== 'readme.md';
+            })
+            .sort((x, y) => x.localeCompare(y, 'es', { numeric: true }));
+          if (!lista.length) return;
+          hayAlgo = true;
+          const h = document.createElement('h3');
+          h.textContent = titulo;
+          const ul = document.createElement('ul');
+          ul.className = 'files';
+          lista.forEach((ruta) => ul.appendChild(fila(ruta)));
+          caja.append(h, ul);
+        });
+        if (!hayAlgo) caja.innerHTML = '<p class="muted">Pronto subiré material aquí.</p>';
+      })
+      .catch(() => {
+        caja.innerHTML = '<p class="muted">No se pudo cargar el material. Intenta recargar la página en unos minutos.</p>';
+      });
   </script>
 </body>
 </html>
