@@ -565,15 +565,27 @@
       return true;
     }
 
+    // Lista de rutas de todo lo que hay en material/. Primero usa material.json,
+    // que GitHub Pages genera al publicar; si no está, le pregunta a la API de GitHub.
+    async function todasLasRutas() {
+      try {
+        const r = await fetch('material.json', { cache: 'no-cache' });
+        if (r.ok) return (await r.json()).map((ruta) => ruta.replace(/^\//, ''));
+      } catch (e) { /* sigue con la API */ }
+      return archivos('material');
+    }
+
     (async () => {
-      const raiz = await contenido('material');
-      const carpetas = raiz.filter((x) => x.type === 'dir')
-        .sort((x, y) => x.name.localeCompare(y.name, 'es', { numeric: true }));
-      const sueltos = raiz.filter((x) => x.type === 'file').map((x) => x.path);
-      const listas = await Promise.all(carpetas.map((c) => archivos(c.path)));
+      const rutas = (await todasLasRutas()).filter((ruta) => ruta.startsWith('material/'));
+      const carpetas = [...new Set(rutas.filter((r) => r.split('/').length > 2).map((r) => r.split('/')[1]))]
+        .sort((x, y) => x.localeCompare(y, 'es', { numeric: true }));
+      const sueltos = rutas.filter((r) => r.split('/').length === 2);
       caja.innerHTML = '';
       let hayAlgo = false;
-      carpetas.forEach((c, i) => { if (grupo(titulo(c.name), c.path, listas[i])) hayAlgo = true; });
+      carpetas.forEach((c) => {
+        const lista = rutas.filter((r) => r.split('/')[1] === c && r.split('/').length > 2);
+        if (grupo(titulo(c), 'material/' + c, lista)) hayAlgo = true;
+      });
       if (grupo('Otro material', '', sueltos)) hayAlgo = true;
       if (!hayAlgo) caja.innerHTML = '<p class="muted">Pronto subiré material aquí.</p>';
     })().catch(() => {
