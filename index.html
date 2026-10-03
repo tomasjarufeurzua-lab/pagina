@@ -806,10 +806,30 @@
         if (!subcarpetas.has(sub)) subcarpetas.set(sub, []);
         subcarpetas.get(sub).push(ruta);
       }
-      if (directos.length) contenedor.appendChild(listaArchivos(directos));
-      [...subcarpetas.keys()].sort((x, y) => x.localeCompare(y, 'es', { numeric: true })).forEach((sub) => {
-        const nombreSub = titulo(sub);
-        const archivosSub = subcarpetas.get(sub);
+      // Archivos y carpetas se ordenan juntos. Con número al inicio ("1 - ...") van según el
+      // número; sin número, los archivos van primero y las carpetas después.
+      const elementos = [
+        ...directos.map((ruta) => ({ tipo: 'archivo', nombre: ruta.split('/').pop().replace(/\.[^.]+$/, ''), ruta })),
+        ...[...subcarpetas.keys()].map((sub) => ({ tipo: 'carpeta', nombre: sub, rutas: subcarpetas.get(sub) })),
+      ];
+      const rango = (e) => {
+        const m = e.nombre.match(/^(\d+)\s*-\s+/);
+        return m ? [1, Number(m[1])] : [e.tipo === 'archivo' ? 0 : 2, 0];
+      };
+      elementos.sort((x, y) => {
+        const [rx, nx] = rango(x), [ry, ny] = rango(y);
+        return rx - ry || nx - ny || x.nombre.localeCompare(y.nombre, 'es', { numeric: true });
+      });
+      let seguidos = [];
+      const vaciarArchivos = () => {
+        if (seguidos.length) contenedor.appendChild(listaArchivos(seguidos));
+        seguidos = [];
+      };
+      elementos.forEach((e) => {
+        if (e.tipo === 'archivo') { seguidos.push(e.ruta); return; }
+        vaciarArchivos();
+        const nombreSub = titulo(e.nombre);
+        const archivosSub = e.rutas;
         if (PLEGABLES.includes(nombreSub)) {
           // Subsección plegable: empieza cerrada y muestra cuántos archivos tiene
           const bloque = document.createElement('details');
@@ -833,6 +853,7 @@
         dibujarNivel(bloque, archivosSub, nivel + 1);
         contenedor.appendChild(bloque);
       });
+      vaciarArchivos();
     }
 
     function grupo(nombre, carpeta, lista) {
