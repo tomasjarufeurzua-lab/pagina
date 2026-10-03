@@ -792,35 +792,23 @@
 
     // Un grupo por carpeta. Los archivos sueltos van primero y cada
     // subcarpeta aparece como un subtítulo con sus propios archivos.
-    function grupo(nombre, carpeta, lista) {
-      lista = lista.filter(visible);
-      if (!lista.length) return false;
-      const nivel = carpeta ? carpeta.split('/').length : 1;
+    // Dibuja lo que hay en un nivel de carpetas: primero los archivos sueltos y luego
+    // cada subcarpeta (que puede tener más subcarpetas dentro). Se ordena con el nombre
+    // real de la carpeta (puede llevar un número al inicio, como "1 - Laboratorio") y se
+    // muestra sin ese número.
+    function dibujarNivel(contenedor, lista, nivel) {
       const directos = [];
       const subcarpetas = new Map();
       for (const ruta of lista) {
         const partes = ruta.split('/');
         if (partes.length === nivel + 1) { directos.push(ruta); continue; }
-        // Se agrupa y ordena con el nombre real de la carpeta (que puede llevar un número
-        // al inicio, como "1 - Laboratorio") y se muestra sin ese número.
-        const sub = partes.slice(nivel, -1).join(' / ');
+        const sub = partes[nivel];
         if (!subcarpetas.has(sub)) subcarpetas.set(sub, []);
         subcarpetas.get(sub).push(ruta);
       }
-      const h = document.createElement('h3');
-      h.textContent = nombre;
-      if (DESTACADOS.includes(nombre)) {
-        const punto = document.createElement('span');
-        punto.className = 'dot';
-        punto.title = 'Importante';
-        punto.setAttribute('role', 'img');
-        punto.setAttribute('aria-label', 'Importante');
-        h.prepend(punto);
-      }
-      caja.appendChild(h);
-      if (directos.length) caja.appendChild(listaArchivos(directos));
+      if (directos.length) contenedor.appendChild(listaArchivos(directos));
       [...subcarpetas.keys()].sort((x, y) => x.localeCompare(y, 'es', { numeric: true })).forEach((sub) => {
-        const nombreSub = sub.split(' / ').map(titulo).join(' / ');
+        const nombreSub = titulo(sub);
         const archivosSub = subcarpetas.get(sub);
         if (PLEGABLES.includes(nombreSub)) {
           // Subsección plegable: empieza cerrada y muestra cuántos archivos tiene
@@ -832,17 +820,37 @@
           cuenta.className = 'cuenta';
           cuenta.textContent = archivosSub.length === 1 ? '1 archivo' : archivosSub.length + ' archivos';
           resumen.appendChild(cuenta);
-          bloque.append(resumen, listaArchivos(archivosSub));
-          caja.appendChild(bloque);
+          bloque.appendChild(resumen);
+          dibujarNivel(bloque, archivosSub, nivel + 1);
+          contenedor.appendChild(bloque);
           return;
         }
         const bloque = document.createElement('div');
         bloque.className = 'subgroup';
         const h4 = document.createElement('h4');
         h4.textContent = nombreSub;
-        bloque.append(h4, listaArchivos(archivosSub));
-        caja.appendChild(bloque);
+        bloque.appendChild(h4);
+        dibujarNivel(bloque, archivosSub, nivel + 1);
+        contenedor.appendChild(bloque);
       });
+    }
+
+    function grupo(nombre, carpeta, lista) {
+      lista = lista.filter(visible);
+      if (!lista.length) return false;
+      const nivel = carpeta ? carpeta.split('/').length : 1;
+      const h = document.createElement('h3');
+      h.textContent = nombre;
+      if (DESTACADOS.includes(nombre)) {
+        const punto = document.createElement('span');
+        punto.className = 'dot';
+        punto.title = 'Importante';
+        punto.setAttribute('role', 'img');
+        punto.setAttribute('aria-label', 'Importante');
+        h.prepend(punto);
+      }
+      caja.appendChild(h);
+      dibujarNivel(caja, lista, nivel);
       return true;
     }
 
