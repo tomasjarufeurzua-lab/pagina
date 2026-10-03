@@ -652,8 +652,9 @@
     const caja = document.getElementById('material-list');
 
     // "Mi_archivo - parte-1.pdf" → "Mi archivo — parte 1"
+    // Un número al inicio ("1 - Resumen.pdf") sirve para ordenar y no se muestra.
     function titulo(nombre) {
-      return nombre.replace(/\s+-\s+/g, ' — ').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+      return nombre.replace(/^\d+\s*-\s+/, '').replace(/\s+-\s+/g, ' — ').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
     }
     function bonito(archivo) {
       return titulo(archivo.replace(/\.[^.]+$/, ''));
@@ -718,7 +719,7 @@
     }
 
     function ordenar(lista) {
-      const n = (ruta) => bonito(ruta.split('/').pop());
+      const n = (ruta) => ruta.split('/').pop().replace(/\.[^.]+$/, '');
       return lista.sort((x, y) => n(x).localeCompare(n(y), 'es', { numeric: true }));
     }
 
