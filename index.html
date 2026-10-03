@@ -318,6 +318,34 @@
       padding-left: 16px;
       border-left: 1px solid rgba(148, 163, 184, 0.2);
     }
+    .subgroup.plegable summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0 4px;
+      padding: 4px 0;
+      cursor: pointer;
+      list-style: none;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      user-select: none;
+    }
+    .subgroup.plegable summary::-webkit-details-marker { display: none; }
+    .subgroup.plegable summary::before {
+      content: "";
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      transition: transform 0.2s;
+    }
+    .subgroup.plegable[open] > summary::before { transform: rotate(45deg); }
+    .subgroup.plegable summary:hover { color: var(--heading); }
+    .subgroup.plegable summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+    .subgroup.plegable .cuenta { margin-left: auto; font-size: 0.75rem; font-weight: 500; color: var(--dim); }
     .subgroup h4 {
       color: var(--text);
       font-size: 0.85rem;
@@ -695,6 +723,9 @@
     // Secciones que llevan un punto rojo para que se noten más (nombre de la carpeta, sin tildes cambiadas)
     const DESTACADOS = ['Ayudantía Laboratorio Álgebra Lineal'];
 
+    // Subsecciones que se pueden plegar (nombre de la carpeta, sin el número inicial)
+    const PLEGABLES = ['Control 2 — Ensayos'];
+
     function visible(ruta) {
       const nombre = ruta.split('/').pop();
       return !nombre.startsWith('.') && nombre.toLowerCase() !== 'readme.md';
@@ -760,11 +791,27 @@
       caja.appendChild(h);
       if (directos.length) caja.appendChild(listaArchivos(directos));
       [...subcarpetas.keys()].sort((x, y) => x.localeCompare(y, 'es', { numeric: true })).forEach((sub) => {
+        const nombreSub = sub.split(' / ').map(titulo).join(' / ');
+        const archivosSub = subcarpetas.get(sub);
+        if (PLEGABLES.includes(nombreSub)) {
+          // Subsección plegable: empieza cerrada y muestra cuántos archivos tiene
+          const bloque = document.createElement('details');
+          bloque.className = 'subgroup plegable';
+          const resumen = document.createElement('summary');
+          resumen.textContent = nombreSub;
+          const cuenta = document.createElement('span');
+          cuenta.className = 'cuenta';
+          cuenta.textContent = archivosSub.length === 1 ? '1 archivo' : archivosSub.length + ' archivos';
+          resumen.appendChild(cuenta);
+          bloque.append(resumen, listaArchivos(archivosSub));
+          caja.appendChild(bloque);
+          return;
+        }
         const bloque = document.createElement('div');
         bloque.className = 'subgroup';
         const h4 = document.createElement('h4');
-        h4.textContent = sub.split(' / ').map(titulo).join(' / ');
-        bloque.append(h4, listaArchivos(subcarpetas.get(sub)));
+        h4.textContent = nombreSub;
+        bloque.append(h4, listaArchivos(archivosSub));
         caja.appendChild(bloque);
       });
       return true;
