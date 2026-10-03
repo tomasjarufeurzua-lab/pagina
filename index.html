@@ -739,7 +739,7 @@
         marca.textContent = 'Importante';
         a.insertBefore(marca, nombre);
       }
-      if (ARCHIVOS_DIFICILES.includes(bonito(archivo))) {
+      if (ARCHIVOS_DIFICILES.includes(archivo.replace(/\.[^.]+$/, ''))) {
         a.classList.add('dificil');
         const marca = document.createElement('span');
         marca.className = 'marca-importante dificil';
@@ -767,8 +767,8 @@
     // (título tal como se ve en la página, sin el número inicial)
     const ARCHIVOS_IMPORTANTES = ['Ejercicios de práctica 1 para el Control 1 (Mathematica)'];
 
-    // Archivos que se destacan en rojo con la etiqueta "Más difícil"
-    const ARCHIVOS_DIFICILES = ['Ensayo ₂ Certamen 2'];
+    // Archivos que se destacan en rojo con la etiqueta "Más difícil" (nombre del archivo, con su número inicial)
+    const ARCHIVOS_DIFICILES = ['3 - Ensayo Certamen 2'];
 
     // Subsecciones que se pueden plegar (nombre de la carpeta, sin el número inicial)
     const PLEGABLES = ['Control 2 — Ensayos', 'Resumen'];
