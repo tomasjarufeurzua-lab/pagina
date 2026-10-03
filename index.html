@@ -741,7 +741,9 @@
       for (const ruta of lista) {
         const partes = ruta.split('/');
         if (partes.length === nivel + 1) { directos.push(ruta); continue; }
-        const sub = partes.slice(nivel, -1).map(titulo).join(' / ');
+        // Se agrupa y ordena con el nombre real de la carpeta (que puede llevar un número
+        // al inicio, como "1 - Laboratorio") y se muestra sin ese número.
+        const sub = partes.slice(nivel, -1).join(' / ');
         if (!subcarpetas.has(sub)) subcarpetas.set(sub, []);
         subcarpetas.get(sub).push(ruta);
       }
@@ -761,7 +763,7 @@
         const bloque = document.createElement('div');
         bloque.className = 'subgroup';
         const h4 = document.createElement('h4');
-        h4.textContent = sub;
+        h4.textContent = sub.split(' / ').map(titulo).join(' / ');
         bloque.append(h4, listaArchivos(subcarpetas.get(sub)));
         caja.appendChild(bloque);
       });
