@@ -337,6 +337,7 @@
       letter-spacing: 0.04em;
       vertical-align: 1px;
     }
+    .cuenta-regresiva.sola { display: table; margin: 8px 0 0; }
     .marca-importante {
       flex-shrink: 0;
       padding: 2px 8px;
@@ -787,16 +788,38 @@
         { nombre: 'Certamen 3', fecha: '2026-11-26' },
       ],
     };
-    function textoCuentaRegresiva(ramo) {
+    // Devuelve el texto de la cuenta regresiva en varias versiones, de la más larga a la más corta,
+    // para poder elegir la que cabe en pantalla.
+    function textosCuentaRegresiva(ramo) {
       const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date());
       const dias = (e) => Math.round((Date.parse(e.fecha) - Date.parse(hoy)) / 86400000);
       const proxima = (EVALUACIONES[ramo] || []).find((e) => dias(e) >= 0);
-      if (!proxima) return '';
+      if (!proxima) return null;
       const d = dias(proxima);
-      if (d === 0) return 'Hoy es el ' + proxima.nombre;
-      if (d === 1) return 'Mañana es el ' + proxima.nombre;
-      return 'Faltan ' + d + ' días para el ' + proxima.nombre;
+      if (d === 0) return ['Hoy es el ' + proxima.nombre, 'Hoy: ' + proxima.nombre, 'Hoy'];
+      if (d === 1) return ['Mañana es el ' + proxima.nombre, 'Mañana: ' + proxima.nombre, 'Mañana'];
+      return ['Faltan ' + d + ' días para el ' + proxima.nombre, d + ' días para ' + proxima.nombre, 'Faltan ' + d + ' días', d + ' días'];
     }
+
+    // Deja en cada etiqueta la versión más larga que cabe en la misma línea que el título del ramo.
+    // Si ni la más corta cabe, queda la más corta, en su propia línea debajo del título.
+    function ajustarCuentas() {
+      document.querySelectorAll('.cuenta-regresiva').forEach((aviso) => {
+        const textos = JSON.parse(aviso.dataset.textos);
+        const h = aviso.parentNode;
+        const rango = document.createRange();
+        rango.selectNodeContents([...h.childNodes].find((n) => n.nodeType === 3));
+        const cabe = () => {
+          const lineas = rango.getClientRects();
+          const ultima = lineas[lineas.length - 1];
+          return !ultima || aviso.getBoundingClientRect().top < ultima.bottom - 1;
+        };
+        aviso.classList.remove('sola');
+        const entra = textos.some((texto) => { aviso.textContent = texto; return cabe(); });
+        if (!entra) aviso.classList.add('sola');
+      });
+    }
+    window.addEventListener('resize', ajustarCuentas);
 
     // Secciones que llevan un punto rojo para que se noten más (nombre de la carpeta, sin tildes cambiadas)
     const DESTACADOS = ['Ayudantía Laboratorio Álgebra Lineal'];
@@ -926,11 +949,11 @@
         punto.setAttribute('aria-label', 'Importante');
         h.prepend(punto);
       }
-      const cuenta = textoCuentaRegresiva(nombre);
+      const cuenta = textosCuentaRegresiva(nombre);
       if (cuenta) {
         const aviso = document.createElement('span');
         aviso.className = 'cuenta-regresiva';
-        aviso.textContent = cuenta;
+        aviso.dataset.textos = JSON.stringify(cuenta);
         h.appendChild(aviso);
       }
       caja.appendChild(h);
@@ -968,6 +991,8 @@
         if (grupo(titulo(c), 'material/' + c, lista)) hayAlgo = true;
       });
       if (grupo('Otro material', '', sueltos)) hayAlgo = true;
+      ajustarCuentas();
+      if (document.fonts) document.fonts.ready.then(ajustarCuentas);
       if (!hayAlgo) caja.innerHTML = '<p class="muted">Pronto subiré material aquí.</p>';
     })().catch(() => {
       caja.innerHTML = '<p class="muted">No se pudo cargar el material. Intenta recargar la página en unos minutos.</p>';
