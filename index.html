@@ -154,6 +154,8 @@
     .go-material:hover .arrow { transform: translateY(3px); }
     .go-material:active { transform: translateY(0); }
     .go-desktop { display: none; }
+    .go-sobre { display: none; }
+    .go-sobre:hover .arrow { transform: translateX(4px); }
 
     /* Columna derecha */
     main section { margin-bottom: 96px; }
@@ -583,6 +585,7 @@
       body.movil.con-seccion main { display: block; }
       body.movil main section { display: none; }
       body.movil main section.visible { display: block; }
+      body.movil[data-pagina="material"] .go-sobre, body.movil[data-pagina="calculadora"] .go-sobre { display: inline-flex; margin: 8px 0 32px; }
       body.movil.con-seccion .wrap { padding-bottom: 24px; }
     }
 
@@ -797,6 +800,8 @@
         <p>Elige tu ramo, ingresa las notas que ya tienes y te muestro cómo vas y qué nota necesitas. Las notas no se guardan: al salir o recargar la página se borran. Se redondea como en la USM: desde 54,5 cuenta como 55.</p>
         <div id="calc" class="calc"></div>
       </section>
+
+      <a class="go-material go-sobre" href="#sobre-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Sobre mí <span class="arrow" aria-hidden="true">→</span></a>
 
       <footer>
         <p>Hecho con HTML y CSS.</p>
@@ -1706,15 +1711,21 @@
       const lista = menu.querySelector('ul');
       const secciones = [...document.querySelectorAll('main section')];
 
-      // Secciones que se muestran juntas bajo una misma opcion del menu
-      const PAGINAS = { 'sobre-mi': ['sobre-mi', 'experiencia', 'educacion', 'logros', 'habilidades'] };
-      const paginaDe = (id) => Object.keys(PAGINAS).find((k) => PAGINAS[k].includes(id)) || id;
+      // Secciones que se ven en cada opcion del menu. Desde Material tambien se ve la
+      // calculadora (esta abajo), pero desde la calculadora no se ve el material.
+      const PAGINAS = {
+        'sobre-mi': ['sobre-mi', 'experiencia', 'educacion', 'logros', 'habilidades'],
+        material: ['material', 'calculadora'],
+        calculadora: ['calculadora'],
+      };
+      // A que opcion del menu pertenece una seccion (los enlaces a experiencia, logros, etc. abren Sobre mi)
+      const paginaDe = (id) => (PAGINAS['sobre-mi'].includes(id) ? 'sobre-mi' : id);
 
       // Opciones: inicio y una por pagina (los nombres salen del menu de escritorio)
       const opciones = [['inicio', 'Inicio']];
       document.querySelectorAll('nav.toc a').forEach((a) => {
         const id = a.getAttribute('href').slice(1);
-        if (paginaDe(id) === id) opciones.push([id, a.textContent.trim()]);
+        if (PAGINAS[id]) opciones.push([id, a.textContent.trim()]);
       });
       opciones.forEach(([id, texto]) => {
         const li = document.createElement('li');
@@ -1737,8 +1748,9 @@
         const actual = secciones.find((s) => s.id === id);
         const pagina = actual ? paginaDe(actual.id) : null;
         if (movil.matches) {
-          secciones.forEach((s) => s.classList.toggle('visible', !!pagina && paginaDe(s.id) === pagina));
+          secciones.forEach((s) => s.classList.toggle('visible', !!pagina && PAGINAS[pagina].includes(s.id)));
           document.body.classList.toggle('con-seccion', !!actual);
+          document.body.dataset.pagina = pagina || '';
           lista.querySelectorAll('a').forEach((a) => a.classList.toggle('actual', a.dataset.id === (pagina || 'inicio')));
         }
         if (desplazar && movil.matches) {
@@ -1752,6 +1764,7 @@
         if (!movil.matches) {
           abrirMenu(false);
           document.body.classList.remove('con-seccion');
+          delete document.body.dataset.pagina;
           secciones.forEach((s) => s.classList.remove('visible'));
         } else {
           mostrar(false);
