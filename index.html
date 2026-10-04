@@ -326,6 +326,76 @@
     .files a.dificil .name { font-weight: 600; }
     .files a.dificil .ext { background: #ef4444; color: #fff; }
     .marca-importante.dificil { background: #ef4444; color: #fff; }
+    /* Calculadora de promedio */
+    .calc { margin-top: 20px; }
+    .calc button { font: inherit; cursor: pointer; }
+    .calc-ramos { display: grid; gap: 12px; grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .calc-ramos { grid-template-columns: repeat(3, 1fr); } }
+    .calc-ramo {
+      padding: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--heading);
+      text-align: left;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .calc-ramo:hover, .calc-ramo:focus-visible { background: var(--card-hover); border-color: var(--accent); outline: none; }
+    .calc-ramo strong { display: block; }
+    .calc-ramo span { color: var(--dim); font-size: 0.85rem; }
+    .calc-pregunta { margin: 0 0 12px; color: var(--heading); font-weight: 600; }
+    .calc-cabeza { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 20px; }
+    .calc-cabeza h3 { margin: 0; color: var(--heading); font-size: 1.05rem; }
+    .calc-links { display: flex; gap: 16px; }
+    .calc-link { padding: 0; border: 0; background: none; color: var(--dim); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
+    .calc-link:hover { color: var(--accent); }
+    .calc-grupo { margin: 0 0 20px; }
+    .calc-grupo[hidden] { display: none; }
+    .calc-grupo h4 { margin: 0 0 4px; color: var(--heading); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .calc-grupo .calc-nota { margin: 0 0 8px; color: var(--dim); font-size: 0.85rem; }
+    .calc-campos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+    .calc-campo label { display: block; margin-bottom: 4px; color: var(--dim); font-size: 0.8rem; }
+    .calc-campo input, .calc-fila input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--heading);
+      font: inherit;
+    }
+    .calc-campo input:focus-visible, .calc-fila input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .calc input.invalido { border-color: #ef4444; }
+    .calc-campo.descartado input { text-decoration: line-through; opacity: 0.6; }
+    .calc-pista { min-height: 1.2em; margin-top: 4px; font-size: 0.78rem; color: var(--dim); }
+    .calc-pista.necesita { color: var(--accent); font-weight: 600; }
+    .calc-filas { display: grid; gap: 8px; margin-bottom: 12px; }
+    .calc-fila { display: grid; gap: 8px; grid-template-columns: 1fr 76px 76px 32px; align-items: center; }
+    .calc-fila .quitar { padding: 4px; border: 0; background: none; color: var(--dim); font-size: 1.1rem; }
+    .calc-fila .quitar:hover { color: #ef4444; }
+    .calc-cols { display: grid; gap: 8px; grid-template-columns: 1fr 76px 76px 32px; margin-bottom: 4px; color: var(--dim); font-size: 0.75rem; }
+    .calc-boton { padding: 6px 12px; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 6px; background: none; color: var(--heading); font-size: 0.85rem; }
+    .calc-boton:hover { border-color: var(--accent); color: var(--accent); }
+    .calc-pasa { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; }
+    .calc-pasa input { width: 80px; }
+    .calc-resultado {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: inset 3px 0 0 rgba(148, 163, 184, 0.5);
+    }
+    .calc-resultado p { margin: 8px 0 0; }
+    .calc-resultado p:first-child { margin-top: 0; }
+    .calc-resultado .grande { color: var(--heading); font-size: 1.1rem; font-weight: 600; }
+    .calc-pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .calc-pill.ok { background: var(--accent); color: #0f2f2b; }
+    .calc-pill.mal { background: #ef4444; color: #fff; }
+    .calc-pill.global { background: #f59e0b; color: #2a1a00; }
+    .calc-resultado.ok { box-shadow: inset 3px 0 0 var(--accent); }
+    .calc-resultado.mal { box-shadow: inset 3px 0 0 #ef4444; }
+    .calc-resultado.global { box-shadow: inset 3px 0 0 #f59e0b; }
+    @media (max-width: 420px) { .calc-fila, .calc-cols { grid-template-columns: 1fr 64px 64px 28px; } }
     .cuenta-regresiva {
       display: inline-block;
       margin-left: 12px;
@@ -471,7 +541,7 @@
     /* Al imprimir sale como un CV en blanco y negro */
     @media print {
       :root { --bg: #fff; --text: #333; --heading: #000; --dim: #555; --accent: #000; --accent-bg: #eee; }
-      .spotlight, nav.toc, .social, .cta, .go-material, footer, #material { display: none !important; }
+      .spotlight, nav.toc, .social, .cta, .go-material, footer, #material, #calculadora { display: none !important; }
       .wrap { display: block; padding: 0; }
       .side, main { width: auto; position: static; padding: 0; max-height: none; }
       .side { margin-bottom: 24px; }
@@ -502,6 +572,7 @@
             <li><a href="#logros"><span class="line"></span>Logros</a></li>
             <li><a href="#habilidades"><span class="line"></span>Habilidades</a></li>
             <li><a href="#material"><span class="line"></span>Material</a></li>
+            <li><a href="#calculadora"><span class="line"></span>Calculadora</a></li>
           </ul>
         </nav>
       </div>
@@ -651,6 +722,12 @@
         <h2 class="sec-title">Material</h2>
         <p>Apuntes, ejercicios y otro material de estudio que he preparado. Puedes descargarlos libremente.</p>
         <div id="material-list" class="material"><p class="muted">Cargando material…</p></div>
+      </section>
+
+      <section id="calculadora">
+        <h2 class="sec-title">Calculadora de promedio</h2>
+        <p>Elige tu ramo, ingresa las notas que ya tienes y te muestro cómo vas y qué nota necesitas. Las notas se guardan solo en tu navegador.</p>
+        <div id="calc" class="calc"></div>
       </section>
 
       <footer>
@@ -1012,6 +1089,393 @@
     })().catch(() => {
       caja.innerHTML = '<p class="muted">No se pudo cargar el material. Intenta recargar la página en unos minutos.</p>';
     });
+  </script>
+  <script>
+    // Calculadora de promedio. Las notas van de 0 a 100 y se guardan solo en el navegador.
+    (function () {
+      const CLAVE = 'calculadora-promedio';
+      const RAMOS = [
+        { id: 'prob', nombre: 'Probabilidad y Estadística', detalle: 'Ponderación del programa' },
+        { id: 'edo', nombre: 'Ecuaciones Diferenciales', detalle: '75% certámenes, 25% controles' },
+        { id: 'otro', nombre: 'Otro', detalle: 'Pon tus propias ponderaciones' },
+      ];
+      const estado = { ramo: null, prob: {}, edo: {}, otro: { pasa: '55', filas: [{}, {}] } };
+      try {
+        const g = JSON.parse(localStorage.getItem(CLAVE));
+        if (g && typeof g === 'object') {
+          if (RAMOS.some((r) => r.id === g.ramo)) estado.ramo = g.ramo;
+          for (const id of ['prob', 'edo']) if (g[id] && typeof g[id] === 'object') estado[id] = g[id];
+          if (g.otro && Array.isArray(g.otro.filas) && g.otro.filas.length) estado.otro = g.otro;
+        }
+      } catch (e) { /* sin almacenamiento: funciona igual, solo no recuerda */ }
+      const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) { /* nada */ } };
+
+      // ---- utilidades ----
+      const EPS = 1e-9;
+      const ge = (a, b) => a >= b - EPS;
+      const prom = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+      const fmt = (v, d = 1) => v.toFixed(d).replace('.', ',');
+      // Texto → número de 0 a 100; null si está vacío, NaN si no es válido
+      const num = (t) => {
+        const s = String(t == null ? '' : t).trim().replace(',', '.');
+        if (s === '') return null;
+        const v = Number(s);
+        return Number.isFinite(v) && v >= 0 && v <= 100 ? v : NaN;
+      };
+      const el = (tag, clase, texto) => {
+        const e = document.createElement(tag);
+        if (clase) e.className = clase;
+        if (texto != null) e.textContent = texto;
+        return e;
+      };
+
+      // ---- ramos con ponderación fija ----
+      // evaluar recibe todas las notas y devuelve la nota semestral (ns) y su estado.
+      const MODELOS = {
+        prob: {
+          grupos: [
+            { titulo: 'Certámenes', campos: [['c1', 'Certamen 1'], ['c2', 'Certamen 2'], ['c3', 'Certamen 3']] },
+            { titulo: 'Controles', nota: 'Se descarta el peor y se promedian los 3 mejores.', campos: [['k1', 'Control 1'], ['k2', 'Control 2'], ['k3', 'Control 3'], ['k4', 'Control 4']] },
+            { titulo: 'Laboratorio', campos: [['lab', 'Laboratorio']] },
+          ],
+          evaluar(v) {
+            const cert = [v.c1, v.c2, v.c3];
+            const mejores = [v.k1, v.k2, v.k3, v.k4].sort((a, b) => b - a).slice(0, 3);
+            const ns = 0.75 * prom(cert) + 0.15 * prom(mejores) + 0.10 * v.lab;
+            if (!ge(ns, 45)) return { ns, estado: 'reprobado' };
+            return { ns, estado: ge(ns, 55) && cert.every((c) => ge(c, 40)) ? 'aprobado' : 'global' };
+          },
+          // ¿Ya es seguro que irá a global, aunque falten notas?
+          globalSeguro(lo, hi, v) {
+            const bajo40 = ['c1', 'c2', 'c3'].some((k) => v[k] != null && v[k] < 40);
+            return ge(lo.ns, 45) && (!ge(hi.ns, 55) || bajo40);
+          },
+        },
+        edo: {
+          grupos: [
+            { titulo: 'Certámenes', campos: [['c1', 'Certamen 1'], ['c2', 'Certamen 2'], ['c3', 'Certamen 3']] },
+            { titulo: 'Controles', campos: [['k1', 'Control 1'], ['k2', 'Control 2'], ['k3', 'Control 3']] },
+          ],
+          evaluar(v) {
+            const ns = 0.75 * prom([v.c1, v.c2, v.c3]) + 0.25 * prom([v.k1, v.k2, v.k3]);
+            return { ns, estado: ge(ns, 55) ? 'aprobado' : 'reprobado' };
+          },
+        },
+      };
+
+      // Analiza las notas ingresadas: qué falta, si el resultado ya está decidido y, si falta
+      // una sola nota, cuál es la mínima para aprobar directo.
+      function analizar(m, v) {
+        const claves = m.grupos.flatMap((g) => g.campos.map((c) => c[0]));
+        const faltan = claves.filter((k) => v[k] == null);
+        const rellenar = (x) => { const r = { ...v }; faltan.forEach((k) => { r[k] = x; }); return r; };
+        const lo = m.evaluar(rellenar(0));
+        const hi = m.evaluar(rellenar(100));
+        const res = { faltan, completo: !faltan.length, ns: faltan.length ? null : lo.ns, estado: null, necesita: null };
+        if (res.completo) { res.estado = lo.estado; return res; }
+        if (hi.estado === 'reprobado') res.estado = 'reprobado';
+        else if (m.globalSeguro && m.globalSeguro(lo, hi, v)) res.estado = 'global';
+        if (!res.estado && faltan.length === 1) {
+          let minimo = null;
+          for (let i = 0; i <= 1000 && minimo === null; i++) {
+            if (m.evaluar(rellenar(i / 10)).estado === 'aprobado') minimo = i / 10;
+          }
+          res.necesita = { clave: faltan[0], valor: minimo };
+        }
+        return res;
+      }
+
+      // ---- pantalla ----
+      const cont = document.getElementById('calc');
+
+      function elegirRamo(id) {
+        estado.ramo = id;
+        guardar();
+        dibujar();
+      }
+
+      function dibujar() {
+        cont.replaceChildren();
+        if (!estado.ramo) return dibujarSelector();
+        const ramo = RAMOS.find((r) => r.id === estado.ramo);
+        const cabeza = el('div', 'calc-cabeza');
+        cabeza.appendChild(el('h3', '', ramo.nombre));
+        const links = el('div', 'calc-links');
+        const borrar = el('button', 'calc-link', 'Borrar notas');
+        borrar.type = 'button';
+        borrar.addEventListener('click', () => {
+          if (estado.ramo === 'otro') estado.otro = { pasa: estado.otro.pasa, filas: [{}, {}] };
+          else estado[estado.ramo] = {};
+          guardar();
+          dibujar();
+        });
+        const cambiar = el('button', 'calc-link', 'Cambiar ramo');
+        cambiar.type = 'button';
+        cambiar.addEventListener('click', () => elegirRamo(null));
+        links.append(borrar, cambiar);
+        cabeza.appendChild(links);
+        cont.appendChild(cabeza);
+        if (estado.ramo === 'otro') dibujarOtro(); else dibujarFijo(MODELOS[estado.ramo], estado[estado.ramo]);
+      }
+
+      function dibujarSelector() {
+        cont.appendChild(el('p', 'calc-pregunta', '¿De qué ramo quieres calcular tu promedio?'));
+        const lista = el('div', 'calc-ramos');
+        RAMOS.forEach((r) => {
+          const b = el('button', 'calc-ramo');
+          b.type = 'button';
+          b.append(el('strong', '', r.nombre), el('span', '', r.detalle));
+          b.addEventListener('click', () => elegirRamo(r.id));
+          lista.appendChild(b);
+        });
+        cont.appendChild(lista);
+      }
+
+      function campo(clave, etiqueta, valores, alCambiar) {
+        const caja = el('div', 'calc-campo');
+        const id = 'calc-' + estado.ramo + '-' + clave;
+        const label = el('label', '', etiqueta);
+        label.htmlFor = id;
+        const input = el('input');
+        input.id = id;
+        input.type = 'text';
+        input.inputMode = 'decimal';
+        input.autocomplete = 'off';
+        input.placeholder = '0 – 100';
+        input.value = valores[clave] || '';
+        input.addEventListener('input', () => {
+          valores[clave] = input.value;
+          guardar();
+          alCambiar();
+        });
+        const pista = el('div', 'calc-pista');
+        caja.append(label, input, pista);
+        return { caja, input, pista };
+      }
+
+      function dibujarFijo(m, valores) {
+        const campos = {};
+        m.grupos.forEach((g) => {
+          const grupo = el('div', 'calc-grupo');
+          grupo.appendChild(el('h4', '', g.titulo));
+          if (g.nota) grupo.appendChild(el('p', 'calc-nota', g.nota));
+          const rejilla = el('div', 'calc-campos');
+          g.campos.forEach(([clave, etiqueta]) => {
+            campos[clave] = campo(clave, etiqueta, valores, actualizar);
+            rejilla.appendChild(campos[clave].caja);
+          });
+          grupo.appendChild(rejilla);
+          cont.appendChild(grupo);
+        });
+        // Examen global (solo ramos que lo tienen); aparece cuando corresponde
+        let global = null;
+        if (m.globalSeguro) {
+          const grupo = el('div', 'calc-grupo');
+          grupo.hidden = true;
+          grupo.appendChild(el('h4', '', 'Examen global'));
+          const rejilla = el('div', 'calc-campos');
+          campos.g = campo('g', 'Nota del global', valores, actualizar);
+          rejilla.appendChild(campos.g.caja);
+          grupo.appendChild(rejilla);
+          cont.appendChild(grupo);
+          global = grupo;
+        }
+        const resultado = el('div', 'calc-resultado');
+        resultado.setAttribute('aria-live', 'polite');
+        cont.appendChild(resultado);
+
+        function actualizar() {
+          const v = {};
+          let hayInvalida = false;
+          Object.keys(campos).forEach((k) => {
+            const n = num(valores[k]);
+            campos[k].input.classList.toggle('invalido', Number.isNaN(n));
+            if (Number.isNaN(n)) hayInvalida = true;
+            campos[k].pista.textContent = '';
+            campos[k].pista.classList.remove('necesita');
+            campos[k].caja.classList.remove('descartado');
+            v[k] = Number.isNaN(n) ? null : n;
+          });
+          const r = analizar(m, v);
+          resultado.replaceChildren();
+          resultado.className = 'calc-resultado';
+          if (hayInvalida) resultado.appendChild(el('p', '', 'Revisa las notas marcadas en rojo: deben ir de 0 a 100.'));
+
+          // Control descartado (Probabilidad): el peor de los 4, cuando ya están todos
+          if (m === MODELOS.prob && ['k1', 'k2', 'k3', 'k4'].every((k) => v[k] != null)) {
+            const peor = ['k1', 'k2', 'k3', 'k4'].reduce((a, b) => (v[b] < v[a] ? b : a));
+            campos[peor].caja.classList.add('descartado');
+            campos[peor].pista.textContent = 'Descartado';
+          }
+          if (!r.completo) {
+            resultado.appendChild(el('p', '', (r.faltan.length === 1 ? 'Falta 1 nota' : 'Faltan ' + r.faltan.length + ' notas') + ' para el resultado final.'));
+          }
+          if (r.necesita) {
+            const { clave, valor } = r.necesita;
+            const pista = campos[clave].pista;
+            const etiqueta = m.grupos.flatMap((g) => g.campos).find((c) => c[0] === clave)[1];
+            let texto;
+            if (valor === null) texto = 'Ya no alcanzas a aprobar directo, ni con 100 en ' + etiqueta + '.';
+            else if (valor === 0) texto = 'Ya aprobaste: con cualquier nota en ' + etiqueta + ' apruebas.';
+            else texto = 'Necesitas al menos ' + fmt(valor) + ' en ' + etiqueta + ' para aprobar.';
+            pista.textContent = valor === null ? 'No alcanza' : valor === 0 ? 'Cualquier nota' : 'Necesitas ≥ ' + fmt(valor);
+            if (valor !== null) pista.classList.add('necesita');
+            resultado.appendChild(el('p', 'grande', texto));
+          }
+          if (r.completo) resultado.appendChild(el('p', 'grande', 'NS = ' + fmt(r.ns, 2)));
+          if (r.estado) resumenEstado(m, r, v, valores, resultado, campos);
+          if (global) global.hidden = r.estado !== 'global';
+        }
+        actualizar();
+      }
+
+      // Pastilla y explicación según el estado (reprobado, aprobado o global)
+      function resumenEstado(m, r, v, valores, resultado, campos) {
+        const conGlobal = !!m.globalSeguro;
+        const pill = el('span', 'calc-pill');
+        const nota = (txt, clase) => resultado.appendChild(el('p', clase || '', txt));
+        if (r.estado === 'reprobado') {
+          resultado.classList.add('mal');
+          pill.classList.add('mal');
+          pill.textContent = conGlobal ? '✕ Reprobación directa' : '✕ Reprobado';
+          resultado.prepend(pill);
+          if (r.completo) nota('NF = ' + Math.round(r.ns) + '. ' + (conGlobal ? 'Con NS menor a 45 no hay examen global.' : 'Necesitabas NS de 55 o más.'));
+          else nota('Aun con 100 en lo que falta, no llegas a ' + (conGlobal ? '45' : '55') + '.');
+        } else if (r.estado === 'aprobado') {
+          resultado.classList.add('ok');
+          pill.classList.add('ok');
+          pill.textContent = conGlobal ? '✓ Aprobación directa' : '✓ Aprobado';
+          resultado.prepend(pill);
+          nota('NF = ' + Math.round(r.ns) + '. ¡Aprobado!');
+        } else if (r.estado === 'global') {
+          resultado.classList.add('global');
+          pill.classList.add('global');
+          pill.textContent = '⚠ Global';
+          resultado.prepend(pill);
+          if (!r.completo) {
+            nota('Ya vas a global. Cuando ingreses todas las notas te digo cuánto necesitas.');
+            return;
+          }
+          const sobre55 = ge(r.ns, 55);
+          nota(sobre55
+            ? 'Tienes una prueba escrita bajo 40, así que debes rendir el examen global. Si no lo rindes, NF = 54 (reprobado).'
+            : 'Puedes optar por rendir el examen global. Si no lo rindes, NF = ' + Math.round(r.ns) + ' (reprobado).');
+          const gmin = (54.5 - 0.6 * r.ns) / 0.4;
+          let pistaG;
+          if (gmin > 100 + EPS) { nota('Ni con 100 en el global llegas a aprobar.', 'grande'); pistaG = 'No alcanza'; }
+          else if (gmin <= 0) { nota('Con cualquier nota en el global apruebas.', 'grande'); pistaG = 'Cualquier nota'; }
+          else {
+            const g = Math.ceil(gmin * 10 - EPS) / 10;
+            nota('Necesitas al menos ' + fmt(g) + ' en el global para aprobar (NF = 0,6·NS + 0,4·G).', 'grande');
+            pistaG = 'Necesitas ≥ ' + fmt(g);
+            campos.g.pista.classList.add('necesita');
+          }
+          campos.g.pista.textContent = pistaG;
+          const g = num(valores.g);
+          if (g != null && !Number.isNaN(g)) {
+            const nf = Math.round(0.6 * r.ns + 0.4 * g);
+            nota('Con ' + fmt(g) + ' en el global: NF = ' + nf + (nf >= 55 ? ' → Aprobado.' : ' → Reprobado.'), 'grande');
+          }
+        }
+      }
+
+      // ---- ramo "Otro": notas con su ponderación ----
+      function dibujarOtro() {
+        const o = estado.otro;
+        const pasa = el('div', 'calc-pasa');
+        const lp = el('label', '', 'Nota mínima para aprobar');
+        lp.htmlFor = 'calc-otro-pasa';
+        const ip = el('input');
+        ip.id = 'calc-otro-pasa';
+        ip.type = 'text';
+        ip.inputMode = 'decimal';
+        ip.value = o.pasa;
+        ip.addEventListener('input', () => { o.pasa = ip.value; guardar(); actualizar(); });
+        pasa.append(lp, ip);
+        cont.appendChild(pasa);
+
+        const cols = el('div', 'calc-cols');
+        ['Evaluación', 'Nota', 'Peso %', ''].forEach((t) => cols.appendChild(el('span', '', t)));
+        cont.appendChild(cols);
+        const filas = el('div', 'calc-filas');
+        const entradas = o.filas.map((f, i) => {
+          const fila = el('div', 'calc-fila');
+          const mk = (clave, ph, tipo) => {
+            const inp = el('input');
+            inp.type = 'text';
+            if (tipo === 'num') inp.inputMode = 'decimal';
+            inp.placeholder = ph;
+            inp.value = f[clave] || '';
+            inp.setAttribute('aria-label', ph + ' de la fila ' + (i + 1));
+            inp.addEventListener('input', () => { f[clave] = inp.value; guardar(); actualizar(); });
+            return inp;
+          };
+          const nombre = mk('n', 'Nombre', 'txt');
+          const nota = mk('nota', 'Nota', 'num');
+          const peso = mk('peso', '%', 'num');
+          const quitar = el('button', 'quitar', '×');
+          quitar.type = 'button';
+          quitar.setAttribute('aria-label', 'Quitar fila ' + (i + 1));
+          quitar.addEventListener('click', () => {
+            o.filas.splice(i, 1);
+            if (!o.filas.length) o.filas.push({});
+            guardar();
+            dibujar();
+          });
+          fila.append(nombre, nota, peso, quitar);
+          filas.appendChild(fila);
+          return { f, nota, peso };
+        });
+        cont.appendChild(filas);
+        const agregar = el('button', 'calc-boton', '+ Agregar nota');
+        agregar.type = 'button';
+        agregar.addEventListener('click', () => { o.filas.push({}); guardar(); dibujar(); });
+        cont.appendChild(agregar);
+        const resultado = el('div', 'calc-resultado');
+        resultado.setAttribute('aria-live', 'polite');
+        cont.appendChild(resultado);
+
+        function actualizar() {
+          const minimo = num(o.pasa);
+          ip.classList.toggle('invalido', Number.isNaN(minimo));
+          let total = 0, puntos = 0, pesoIngresado = 0, pendiente = 0, invalida = false;
+          entradas.forEach(({ f, nota, peso }) => {
+            const n = num(f.nota), p = num(f.peso);
+            nota.classList.toggle('invalido', Number.isNaN(n));
+            peso.classList.toggle('invalido', Number.isNaN(p));
+            if (Number.isNaN(n) || Number.isNaN(p)) invalida = true;
+            if (p == null || Number.isNaN(p)) return;
+            total += p;
+            if (n == null || Number.isNaN(n)) pendiente += p;
+            else { puntos += p * n; pesoIngresado += p; }
+          });
+          resultado.replaceChildren();
+          resultado.className = 'calc-resultado';
+          if (invalida || Number.isNaN(minimo)) resultado.appendChild(el('p', '', 'Revisa los campos marcados en rojo: deben ir de 0 a 100.'));
+          if (minimo == null || Number.isNaN(minimo) || total <= 0) {
+            if (!invalida && total <= 0) resultado.appendChild(el('p', '', 'Ingresa al menos una nota con su ponderación.'));
+            return;
+          }
+          if (Math.abs(total - 100) > 0.01) resultado.appendChild(el('p', '', 'Ojo: las ponderaciones suman ' + fmt(total) + '%, no 100%. Calculo igual con ese total.'));
+          const nota = (txt, clase) => resultado.appendChild(el('p', clase || '', txt));
+          const pill = (txt, clase) => { const p = el('span', 'calc-pill ' + clase, txt); resultado.classList.add(clase); resultado.prepend(p); };
+          if (pesoIngresado > 0) nota('Promedio de lo ingresado: ' + fmt(puntos / pesoIngresado, 2) + ' (' + fmt(pesoIngresado) + '% del total).', 'grande');
+          if (pendiente <= EPS) {
+            const nf = puntos / total;
+            nota('Nota final = ' + fmt(nf, 2) + '.', 'grande');
+            pill(ge(nf, minimo) ? '✓ Aprobado' : '✕ Reprobado', ge(nf, minimo) ? 'ok' : 'mal');
+            return;
+          }
+          const necesito = (minimo * total - puntos) / pendiente;
+          if (necesito > 100 + EPS) { nota('Ni con 100 en lo que falta (' + fmt(pendiente) + '%) llegas a ' + fmt(minimo) + '.', 'grande'); pill('✕ No alcanza', 'mal'); }
+          else if (necesito <= 0) { nota('Ya apruebas con cualquier nota en lo que falta.', 'grande'); pill('✓ Aprobado', 'ok'); }
+          else nota('Necesitas al menos ' + fmt(Math.ceil(necesito * 10 - EPS) / 10) + ' de promedio en lo que falta (' + fmt(pendiente) + '% del total) para llegar a ' + fmt(minimo) + '.', 'grande');
+        }
+        actualizar();
+      }
+
+      dibujar();
+    })();
   </script>
 </body>
 </html>
