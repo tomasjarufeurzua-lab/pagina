@@ -35,6 +35,12 @@
       --accent-bg: rgba(45, 212, 191, 0.12);
       --card-hover: rgba(255, 255, 255, 0.06);
       --spot: rgba(255, 255, 255, 0.07);
+      /* Botones: gris metalizado con un pequeno brillo dorado */
+      --metal: linear-gradient(135deg, #5d6268 0%, #42464b 45%, #30343a 70%, #52575d 100%);
+      --metal-borde: rgba(255, 255, 255, 0.28);
+      --metal-glow: 0 0 9px rgba(212, 175, 55, 0.4);
+      --metal-glow-fuerte: 0 0 14px rgba(212, 175, 55, 0.6);
+      --oro: #e9d58f;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; background: var(--bg); }
@@ -135,21 +141,20 @@
       gap: 10px;
       margin: 24px 0 16px;
       padding: 12px 22px;
-      border: 1px solid rgba(94, 234, 212, 0.55);
+      border: 1px solid var(--metal-borde);
       border-radius: 999px;
-      background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(45, 212, 191, 0.06));
-      box-shadow: 0 6px 24px -8px rgba(45, 212, 191, 0.45);
-      color: var(--accent);
+      background: var(--metal);
+      box-shadow: var(--metal-glow);
+      color: var(--heading);
       font-size: 0.95rem;
       font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .go-material svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .go-material .arrow { transition: transform 0.2s; }
+    .go-material svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--oro); }
+    .go-material .arrow { color: var(--oro); transition: transform 0.2s; }
     .go-material:hover, .go-material:focus-visible {
       transform: translateY(-2px);
-      background: rgba(45, 212, 191, 0.24);
-      box-shadow: 0 10px 30px -8px rgba(45, 212, 191, 0.6);
+      box-shadow: var(--metal-glow-fuerte);
     }
     .go-material:hover .arrow { transform: translateY(3px); }
     .go-material:active { transform: translateY(0); }
@@ -339,14 +344,15 @@
     @media (min-width: 640px) { .calc-ramos { grid-template-columns: repeat(3, 1fr); } }
     .calc-ramo {
       padding: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
+      border: 1px solid var(--metal-borde);
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--metal);
+      box-shadow: var(--metal-glow);
       color: var(--heading);
       text-align: left;
-      transition: background 0.2s, border-color 0.2s;
+      transition: box-shadow 0.2s, transform 0.2s;
     }
-    .calc-ramo:hover, .calc-ramo:focus-visible { background: var(--card-hover); border-color: var(--accent); outline: none; }
+    .calc-ramo:hover, .calc-ramo:focus-visible { box-shadow: var(--metal-glow-fuerte); transform: translateY(-1px); outline: none; }
     .calc-pregunta { margin: 0 0 12px; color: var(--heading); font-weight: 600; }
     .calc-cabeza { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 20px; }
     .calc-cabeza h3 { margin: 0; color: var(--heading); font-size: 1.05rem; }
@@ -373,10 +379,10 @@
     .calc-campo.descartado input { text-decoration: line-through; opacity: 0.6; }
     .calc-pista { min-height: 1.2em; margin-top: 4px; font-size: 0.78rem; color: var(--dim); }
     .calc-pista.necesita { color: var(--accent); font-weight: 600; }
-    .calc-boton { padding: 6px 12px; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 6px; background: none; color: var(--heading); font-size: 0.85rem; }
-    .calc-boton:hover { border-color: var(--accent); color: var(--accent); }
+    .calc-boton { padding: 6px 12px; border: 1px solid var(--metal-borde); border-radius: 6px; background: var(--metal); box-shadow: var(--metal-glow); color: var(--heading); font-size: 0.85rem; transition: box-shadow 0.2s; }
+    .calc-boton:hover, .calc-boton:focus-visible { box-shadow: var(--metal-glow-fuerte); outline: none; }
     .calc-editar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .calc-boton.principal { margin-top: 12px; border-color: var(--accent); color: var(--accent); }
+    .calc-boton.principal { margin-top: 12px; color: var(--oro); }
     .calc-radio { display: block; margin: 6px 0; cursor: pointer; }
     .calc-aviso { margin: 8px 0 0; padding: 10px 12px; border-radius: 6px; background: rgba(245, 158, 11, 0.12); box-shadow: inset 3px 0 0 #f59e0b; font-size: 0.85rem; }
     .calc-error { margin: 8px 0 0; color: #f87171; font-size: 0.9rem; }
@@ -548,10 +554,10 @@
         width: 44px;
         height: 44px;
         padding: 0;
-        border: 1px solid rgba(255, 255, 255, 0.28);
+        border: 1px solid var(--metal-borde);
         border-radius: 12px;
-        background: linear-gradient(135deg, #5d6268 0%, #42464b 45%, #30343a 70%, #52575d 100%);
-        box-shadow: 0 0 9px rgba(212, 175, 55, 0.4);
+        background: var(--metal);
+        box-shadow: var(--metal-glow);
         color: var(--heading);
         cursor: pointer;
         animation: menu-pulso 2.6s ease-out infinite;
