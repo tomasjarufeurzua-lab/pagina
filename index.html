@@ -1129,6 +1129,13 @@
         return e;
       };
 
+      // Promedio de pares [peso, nota] ignorando las partes sin nota; null si no hay ninguna
+      function promedioPonderado(partes) {
+        const con = partes.filter(([, x]) => x != null);
+        if (!con.length) return null;
+        return con.reduce((t, [w, x]) => t + w * x, 0) / con.reduce((t, [w]) => t + w, 0);
+      }
+
       // ---- ramos con ponderación fija ----
       // evaluar recibe todas las notas y devuelve la nota semestral (ns) y su estado.
       const MODELOS = {
@@ -1144,6 +1151,14 @@
             const ns = 0.75 * prom(cert) + 0.15 * prom(mejores) + 0.10 * v.lab;
             if (!ge(ns, 45)) return { ns, estado: 'reprobado' };
             return { ns, estado: ge(ns, 55) && cert.every((c) => ge(c, 40)) ? 'aprobado' : 'global' };
+          },
+          // Promedio con las notas que ya hay: cada parte pesa lo suyo, repartido entre las que tienen notas
+          parcial(v) {
+            const ok = (a) => a.filter((x) => x != null);
+            const cert = ok([v.c1, v.c2, v.c3]);
+            let ctrl = ok([v.k1, v.k2, v.k3, v.k4]);
+            if (ctrl.length === 4) ctrl = ctrl.sort((a, b) => b - a).slice(0, 3);
+            return promedioPonderado([[0.75, cert.length ? prom(cert) : null], [0.15, ctrl.length ? prom(ctrl) : null], [0.10, v.lab]]);
           },
           globalTitulo: 'Examen global',
           globalEtiqueta: 'Nota del global',
@@ -1164,6 +1179,12 @@
             if (v.g != null) cert[cert.indexOf(Math.min(...cert))] = v.g;
             const ns = 0.75 * prom(cert) + 0.25 * prom([v.k1, v.k2, v.k3]);
             return { ns, estado: ge(ns, 55) ? 'aprobado' : 'reprobado' };
+          },
+          parcial(v) {
+            const ok = (a) => a.filter((x) => x != null);
+            const cert = ok([v.c1, v.c2, v.c3]);
+            const ctrl = ok([v.k1, v.k2, v.k3]);
+            return promedioPonderado([[0.75, cert.length ? prom(cert) : null], [0.25, ctrl.length ? prom(ctrl) : null]]);
           },
           globalTitulo: 'Certamen global',
           globalEtiqueta: 'Nota del certamen global',
@@ -1317,6 +1338,8 @@
             campos[peor].pista.textContent = 'Descartado';
           }
           if (!r.completo) {
+            const parcial = m.parcial(v);
+            if (parcial != null) resultado.appendChild(el('p', 'grande', 'Por ahora tu promedio es ' + fmt(parcial, 2) + '.'));
             resultado.appendChild(el('p', '', (r.faltan.length === 1 ? 'Falta 1 nota' : 'Faltan ' + r.faltan.length + ' notas') + ' para el resultado final.'));
           }
           if (r.necesita) {
@@ -1489,7 +1512,7 @@
           if (Math.abs(total - 100) > 0.01) resultado.appendChild(el('p', '', 'Ojo: las ponderaciones suman ' + fmt(total) + '%, no 100%. Calculo igual con ese total.'));
           const nota = (txt, clase) => resultado.appendChild(el('p', clase || '', txt));
           const pill = (txt, clase) => { const p = el('span', 'calc-pill ' + clase, txt); resultado.classList.add(clase); resultado.prepend(p); };
-          if (pesoIngresado > 0) nota('Promedio de lo ingresado: ' + fmt(puntos / pesoIngresado, 2) + ' (' + fmt(pesoIngresado) + '% del total).', 'grande');
+          if (pesoIngresado > 0) nota('Por ahora tu promedio es ' + fmt(puntos / pesoIngresado, 2) + ' (' + fmt(pesoIngresado) + '% del total).', 'grande');
           if (pendiente <= EPS) {
             const nf = puntos / total;
             nota('Nota final = ' + fmt(nf, 2) + '.', 'grande');
