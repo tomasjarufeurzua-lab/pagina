@@ -1361,7 +1361,10 @@
           }
           if (!r.completo) {
             const parcial = m.parcial(v);
-            if (parcial != null) resultado.appendChild(el('p', 'grande', 'Por ahora tu promedio es ' + fmt(parcial, 2) + '.'));
+            if (parcial != null) {
+              resultado.appendChild(el('p', 'grande', 'Por ahora tu promedio es ' + fmt(Math.min(parcial, 100), 2) + '.'));
+              avisoTope(resultado, parcial);
+            }
             resultado.appendChild(el('p', '', (r.faltan.length === 1 ? 'Falta 1 nota' : 'Faltan ' + r.faltan.length + ' notas') + ' para el resultado final.'));
           }
           if (r.necesita) {
@@ -1376,12 +1379,20 @@
             if (valor !== null) pista.classList.add('necesita');
             resultado.appendChild(el('p', 'grande', texto));
           }
-          if (r.completo) resultado.appendChild(el('p', 'grande', (m.etiquetaNota || 'NS') + ' = ' + fmt(r.ns, 2)));
+          if (r.completo) {
+            resultado.appendChild(el('p', 'grande', (m.etiquetaNota || 'NS') + ' = ' + fmt(Math.min(r.ns, 100), 2)));
+            avisoTope(resultado, r.ns);
+          }
           if (m.extra) { const t = m.extra(v); if (t) resultado.appendChild(el('p', '', t)); }
           if (r.estado) resumenEstado(m, r, v, valores, resultado, campos);
           if (global) global.hidden = r.estado !== 'global';
         }
         actualizar();
+      }
+
+      // La nota no puede pasar de 100: si te pasas, se avisa cuánto tienes en realidad
+      function avisoTope(resultado, nota) {
+        if (nota > 100 + EPS) resultado.appendChild(el('p', '', 'En realidad tienes ' + fmt(nota, 2) + ', pero el ramo solo se puede pasar con 100 😂'));
       }
 
       // Pastilla y explicación según el estado (reprobado, aprobado o global)
@@ -1402,7 +1413,7 @@
           pill.classList.add('ok');
           pill.textContent = conGlobal ? '✓ Aprobación directa' : '✓ Aprobado';
           resultado.prepend(pill);
-          nota('NF = ' + Math.round(r.ns) + '. ¡Aprobado!');
+          nota('NF = ' + Math.round(Math.min(r.ns, 100)) + '. ¡Aprobado!');
         } else if (r.estado === 'global') {
           resultado.classList.add('global');
           pill.classList.add('global');
