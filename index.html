@@ -1097,7 +1097,7 @@
       ];
       // Ajustes del ramo "Otro": ponderaciones, laboratorio y cuántas evaluaciones tiene
       function otroInicial() {
-        return { listo: false, pc: '', pk: '', lab: 'no', pl: '', pasa: '55', desc: '0', nc: 1, nk: 1, notas: {} };
+        return { listo: false, pc: '', pk: '', lab: 'no', pl: '', desc: '0', nc: 1, nk: 1, notas: {} };
       }
       const estado = { ramo: null, prob: {}, edo: {}, otro: otroInicial() };
       try {
@@ -1397,7 +1397,7 @@
       // Pastilla y explicación según el estado (reprobado, aprobado o global)
       function resumenEstado(m, r, v, valores, resultado, campos) {
         const conGlobal = !!m.globalSeguro;
-        const pasa = m.pasa != null ? m.pasa : 55;
+        const pasa = 55;
         const pill = el('span', 'calc-pill');
         const nota = (txt, clase) => resultado.appendChild(el('p', clase || '', txt));
         if (r.estado === 'reprobado') {
@@ -1539,11 +1539,6 @@
           g2.appendChild(el('p', 'calc-aviso', 'Ojo: el multiplicador se asigna de forma lineal con tu nota de laboratorio: un 0 da ×0,9, un 100 da ×1,1 y un 50 da ×1,0 (multiplicador = 0,9 + 0,002 × nota). Se calcula tu nota con controles y certámenes y después se multiplica por ese valor.'));
         }
 
-        const g3 = grupo('Aprobación');
-        const r3 = el('div', 'calc-campos');
-        g3.appendChild(r3);
-        entrada(r3, 'otro-pasa', 'Nota mínima para aprobar', 'pasa', '55');
-
         const suma = el('p', 'calc-nota');
         const error = el('p', 'calc-error');
         error.setAttribute('role', 'alert');
@@ -1555,14 +1550,12 @@
         const seguir = el('button', 'calc-boton principal', 'Continuar');
         seguir.type = 'button';
         seguir.addEventListener('click', () => {
-          const pk = num(o.pk), pc = num(o.pc), pl = o.lab === 'pondera' ? num(o.pl) : 0, pasa = num(o.pasa);
+          const pk = num(o.pk), pc = num(o.pc), pl = o.lab === 'pondera' ? num(o.pl) : 0;
           const mal = (x) => x == null || Number.isNaN(x);
           if (mal(pk) || mal(pc) || mal(pl) || pk <= 0 || pc <= 0 || (o.lab === 'pondera' && pl <= 0)) {
             error.textContent = 'Completa las ponderaciones con números mayores que 0 y hasta 100.';
           } else if (Math.abs(pk + pc + pl - 100) > 0.01) {
             error.textContent = 'Las ponderaciones deben sumar 100%; ahora suman ' + fmtN(pk + pc + pl) + '%.';
-          } else if (mal(pasa)) {
-            error.textContent = 'Indica la nota mínima para aprobar (de 0 a 100).';
           } else {
             o.listo = true;
             guardar();
@@ -1606,12 +1599,11 @@
         const base = (v) => (pk * promControles(lista(v, 'k', o.nk)) + pc * prom(lista(v, 'c', o.nc)) + (o.lab === 'pondera' ? pl * v.lab : 0)) / (pk + pc + pl);
         return {
           grupos,
-          pasa: num(o.pasa),
           etiquetaNota: 'Nota final',
           descartados: (v) => peoresControles(v, claves('k', o.nk), desc),
           evaluar(v) {
             const ns = o.lab === 'mult' ? base(v) * mult(v.lab) : base(v);
-            return { ns, estado: ge(ns, num(o.pasa)) ? 'aprobado' : 'reprobado' };
+            return { ns, estado: ge(ns, 55) ? 'aprobado' : 'reprobado' };
           },
           parcial(v) {
             const ok = (a) => a.filter((x) => x != null);
