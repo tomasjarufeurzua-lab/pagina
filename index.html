@@ -326,6 +326,21 @@
     .files a.dificil .name { font-weight: 600; }
     .files a.dificil .ext { background: #ef4444; color: #fff; }
     .marca-importante.dificil { background: #ef4444; color: #fff; }
+    .buscador {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0 0 20px;
+      padding: 10px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--heading);
+      font: inherit;
+    }
+    .buscador::placeholder { color: var(--dim); }
+    .buscador:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .material [hidden] { display: none !important; }
     .cuenta-regresiva {
       display: flex;
       align-items: center;
@@ -660,6 +675,7 @@
       <section id="material">
         <h2 class="sec-title">Material</h2>
         <p>Apuntes, ejercicios y otro material de estudio que he preparado. Puedes descargarlos libremente.</p>
+        <input id="buscador" class="buscador" type="search" placeholder="Buscar material…" aria-label="Buscar material" autocomplete="off">
         <div id="material-list" class="material"><p class="muted">Cargando material…</p></div>
         <div id="cuenta-regresiva" class="cuenta-regresiva" hidden><span class="dias"></span><span class="texto"></span></div>
       </section>
@@ -737,11 +753,15 @@
     function bonito(archivo) {
       return titulo(archivo.replace(/\.[^.]+$/, ''));
     }
+    function sinTildes(texto) {
+      return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    }
     function fila(ruta) {
       const partes = ruta.split('/');
       const archivo = partes[partes.length - 1];
       const ext = archivo.includes('.') ? archivo.split('.').pop().toUpperCase() : '';
       const li = document.createElement('li');
+      li.dataset.busca = sinTildes(ruta.replace(/^material\//, '').replace(/\.[^.]+$/, '').replace(/\d+\s*-\s+/g, ''));
       const a = document.createElement('a');
       a.href = ruta.split('/').map(encodeURIComponent).join('/') + (versionMaterial ? '?v=' + versionMaterial : '');
       a.target = '_blank';
@@ -928,6 +948,38 @@
       dibujarNivel(caja, lista, nivel);
       return true;
     }
+
+    // Buscador: oculta los archivos que no coinciden (con el nombre del archivo o de sus
+    // carpetas, sin importar tildes ni mayúsculas) y los títulos que se quedan sin archivos.
+    // Mientras se busca, las secciones plegables se abren; al borrar vuelven a como estaban.
+    const buscador = document.getElementById('buscador');
+    function buscar() {
+      const palabras = sinTildes(buscador.value).split(/\s+/).filter(Boolean);
+      const buscando = palabras.length > 0;
+      const filas = caja.querySelectorAll('li[data-busca]');
+      filas.forEach((li) => { li.hidden = !palabras.every((p) => li.dataset.busca.includes(p)); });
+      const hayVisibles = (el) => !!el.querySelector('li[data-busca]:not([hidden])');
+      caja.querySelectorAll('ul.files, .subgroup').forEach((el) => { el.hidden = buscando && !hayVisibles(el); });
+      caja.querySelectorAll('details.plegable').forEach((d) => {
+        if (buscando) { if (d.dataset.abierto === undefined) d.dataset.abierto = d.open ? '1' : '0'; d.open = true; }
+        else if (d.dataset.abierto !== undefined) { d.open = d.dataset.abierto === '1'; delete d.dataset.abierto; }
+      });
+      // Cada título (h3) se muestra solo si hay algo visible hasta el siguiente título
+      let titulo3 = null, alguno = false, total = 0;
+      const cerrar = () => { if (titulo3) { titulo3.hidden = buscando && !alguno; if (alguno) total++; } };
+      [...caja.children].forEach((el) => {
+        if (el.tagName === 'H3') { cerrar(); titulo3 = el; alguno = false; }
+        else if (el.matches('.sin-resultados')) { /* se maneja abajo */ }
+        else if (!el.hidden && hayVisibles(el)) alguno = true;
+      });
+      cerrar();
+      let aviso = caja.querySelector('.sin-resultados');
+      if (buscando && filas.length && !total) {
+        if (!aviso) { aviso = document.createElement('p'); aviso.className = 'muted sin-resultados'; caja.appendChild(aviso); }
+        aviso.textContent = 'No encontré nada con «' + buscador.value.trim() + '».';
+      } else if (aviso) aviso.remove();
+    }
+    buscador.addEventListener('input', buscar);
 
     // Lista de rutas de todo lo que hay en material/. Primero usa material.json,
     // que GitHub Pages genera al publicar; si no está, le pregunta a la API de GitHub.
