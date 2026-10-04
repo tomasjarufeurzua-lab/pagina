@@ -336,6 +336,7 @@
       font-size: 0.7rem;
       letter-spacing: 0.04em;
       vertical-align: 1px;
+      white-space: nowrap;
     }
     .cuenta-regresiva.sola { display: table; margin: 8px 0 0; }
     .marca-importante {
@@ -819,7 +820,11 @@
         if (!entra) aviso.classList.add('sola');
       });
     }
-    window.addEventListener('resize', ajustarCuentas);
+    // Se vuelve a ajustar cuando cambia el ancho de la lista (giro del celular, ventana) y cuando
+    // terminan de cargar las tipografías, que cambian el ancho del texto.
+    new ResizeObserver(ajustarCuentas).observe(caja);
+    if (document.fonts) document.fonts.addEventListener('loadingdone', ajustarCuentas);
+    window.addEventListener('load', ajustarCuentas);
 
     // Secciones que llevan un punto rojo para que se noten más (nombre de la carpeta, sin tildes cambiadas)
     const DESTACADOS = ['Ayudantía Laboratorio Álgebra Lineal'];
@@ -992,7 +997,6 @@
       });
       if (grupo('Otro material', '', sueltos)) hayAlgo = true;
       ajustarCuentas();
-      if (document.fonts) document.fonts.ready.then(ajustarCuentas);
       if (!hayAlgo) caja.innerHTML = '<p class="muted">Pronto subiré material aquí.</p>';
     })().catch(() => {
       caja.innerHTML = '<p class="muted">No se pudo cargar el material. Intenta recargar la página en unos minutos.</p>';
