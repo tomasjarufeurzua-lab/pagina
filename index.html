@@ -326,6 +326,29 @@
     .files a.dificil .name { font-weight: 600; }
     .files a.dificil .ext { background: #ef4444; color: #fff; }
     .marca-importante.dificil { background: #ef4444; color: #fff; }
+    .cuenta-regresiva {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 24px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.18), rgba(239, 68, 68, 0.04));
+      box-shadow: inset 3px 0 0 #ef4444;
+      color: var(--heading);
+    }
+    .cuenta-regresiva[hidden] { display: none; }
+    .cuenta-regresiva .dias {
+      flex-shrink: 0;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
     .marca-importante {
       flex-shrink: 0;
       padding: 2px 8px;
@@ -637,6 +660,7 @@
       <section id="material">
         <h2 class="sec-title">Material</h2>
         <p>Apuntes, ejercicios y otro material de estudio que he preparado. Puedes descargarlos libremente.</p>
+        <div id="cuenta-regresiva" class="cuenta-regresiva" hidden><span class="dias"></span><span class="texto"></span></div>
         <div id="material-list" class="material"><p class="muted">Cargando material…</p></div>
       </section>
 
@@ -759,6 +783,18 @@
       li.appendChild(a);
       return li;
     }
+
+    // Cuenta regresiva a un certamen (fecha AAAA-MM-DD, hora de Chile). Desaparece al pasar el día.
+    const CERTAMEN = { nombre: 'Certamen de EDO', fecha: '2026-10-05' };
+    (function cuentaRegresiva() {
+      const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date());
+      const dias = Math.round((Date.parse(CERTAMEN.fecha) - Date.parse(hoy)) / 86400000);
+      if (dias < 0) return;
+      const caja = document.getElementById('cuenta-regresiva');
+      caja.querySelector('.dias').textContent = dias === 0 ? 'Hoy' : dias === 1 ? 'Mañana' : 'Faltan ' + dias + ' días';
+      caja.querySelector('.texto').textContent = CERTAMEN.nombre + (dias === 0 ? ': ¡mucho éxito!' : ' — lunes 5 de octubre');
+      caja.hidden = false;
+    })();
 
     // Secciones que llevan un punto rojo para que se noten más (nombre de la carpeta, sin tildes cambiadas)
     const DESTACADOS = ['Ayudantía Laboratorio Álgebra Lineal'];
