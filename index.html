@@ -327,27 +327,15 @@
     .files a.dificil .ext { background: #ef4444; color: #fff; }
     .marca-importante.dificil { background: #ef4444; color: #fff; }
     .cuenta-regresiva {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 24px 0 0;
-      padding: 14px 16px;
-      border-radius: 8px;
-      background: linear-gradient(90deg, rgba(239, 68, 68, 0.18), rgba(239, 68, 68, 0.04));
-      box-shadow: inset 3px 0 0 #ef4444;
-      color: var(--heading);
-    }
-    .cuenta-regresiva[hidden] { display: none; }
-    .cuenta-regresiva .dias {
-      flex-shrink: 0;
-      padding: 2px 10px;
+      display: inline-block;
+      margin-left: 12px;
+      padding: 3px 10px;
       border-radius: 999px;
-      background: #ef4444;
-      color: #fff;
-      font-size: 0.8rem;
-      font-weight: 700;
+      background: #000;
+      color: #ef4444;
+      font-size: 0.7rem;
       letter-spacing: 0.04em;
-      text-transform: uppercase;
+      vertical-align: 1px;
     }
     .marca-importante {
       flex-shrink: 0;
@@ -661,7 +649,6 @@
         <h2 class="sec-title">Material</h2>
         <p>Apuntes, ejercicios y otro material de estudio que he preparado. Puedes descargarlos libremente.</p>
         <div id="material-list" class="material"><p class="muted">Cargando material…</p></div>
-        <div id="cuenta-regresiva" class="cuenta-regresiva" hidden><span class="dias"></span><span class="texto"></span></div>
       </section>
 
       <footer>
@@ -784,17 +771,17 @@
       return li;
     }
 
-    // Cuenta regresiva a un certamen (fecha AAAA-MM-DD, hora de Chile). Desaparece al pasar el día.
-    const CERTAMEN = { nombre: 'Certamen de EDO', fecha: '2026-10-05' };
-    (function cuentaRegresiva() {
+    // Cuenta regresiva a un certamen: aparece al lado del ramo (nombre de la carpeta, como se ve
+    // en la página) y desaparece al pasar el día. Fecha AAAA-MM-DD, hora de Chile.
+    const CERTAMEN = { ramo: 'Ecuaciones Diferenciales', nombre: 'Certamen 2', fecha: '2026-10-05' };
+    function textoCuentaRegresiva() {
       const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date());
       const dias = Math.round((Date.parse(CERTAMEN.fecha) - Date.parse(hoy)) / 86400000);
-      if (dias < 0) return;
-      const caja = document.getElementById('cuenta-regresiva');
-      caja.querySelector('.dias').textContent = dias === 0 ? 'Hoy' : dias === 1 ? 'Mañana' : 'Faltan ' + dias + ' días';
-      caja.querySelector('.texto').textContent = CERTAMEN.nombre + (dias === 0 ? ': ¡mucho éxito!' : ' — lunes 5 de octubre');
-      caja.hidden = false;
-    })();
+      if (dias < 0) return '';
+      if (dias === 0) return 'Hoy es el ' + CERTAMEN.nombre;
+      if (dias === 1) return 'Mañana es el ' + CERTAMEN.nombre;
+      return 'Faltan ' + dias + ' días para el ' + CERTAMEN.nombre;
+    }
 
     // Secciones que llevan un punto rojo para que se noten más (nombre de la carpeta, sin tildes cambiadas)
     const DESTACADOS = ['Ayudantía Laboratorio Álgebra Lineal'];
@@ -923,6 +910,13 @@
         punto.setAttribute('role', 'img');
         punto.setAttribute('aria-label', 'Importante');
         h.prepend(punto);
+      }
+      const cuenta = nombre === CERTAMEN.ramo ? textoCuentaRegresiva() : '';
+      if (cuenta) {
+        const aviso = document.createElement('span');
+        aviso.className = 'cuenta-regresiva';
+        aviso.textContent = cuenta;
+        h.appendChild(aviso);
       }
       caja.appendChild(h);
       dibujarNivel(caja, lista, nivel);
