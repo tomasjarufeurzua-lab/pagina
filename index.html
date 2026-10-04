@@ -341,8 +341,6 @@
       transition: background 0.2s, border-color 0.2s;
     }
     .calc-ramo:hover, .calc-ramo:focus-visible { background: var(--card-hover); border-color: var(--accent); outline: none; }
-    .calc-ramo strong { display: block; }
-    .calc-ramo span { color: var(--dim); font-size: 0.85rem; }
     .calc-pregunta { margin: 0 0 12px; color: var(--heading); font-weight: 600; }
     .calc-cabeza { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 20px; }
     .calc-cabeza h3 { margin: 0; color: var(--heading); font-size: 1.05rem; }
@@ -724,7 +722,7 @@
 
       <section id="calculadora">
         <h2 class="sec-title">Calculadora de promedio</h2>
-        <p>Elige tu ramo, ingresa las notas que ya tienes y te muestro cómo vas y qué nota necesitas. Las notas se guardan solo en tu navegador.</p>
+        <p>Elige tu ramo, ingresa las notas que ya tienes y te muestro cómo vas y qué nota necesitas. Las notas se guardan solo en tu navegador. Se redondea como en la USM: desde 54,5 cuenta como 55.</p>
         <div id="calc" class="calc"></div>
       </section>
 
@@ -1093,9 +1091,9 @@
     (function () {
       const CLAVE = 'calculadora-promedio';
       const RAMOS = [
-        { id: 'prob', nombre: 'Probabilidad y Estadística', detalle: 'Ponderación del programa' },
-        { id: 'edo', nombre: 'Ecuaciones Diferenciales', detalle: '75% certámenes, 25% controles' },
-        { id: 'otro', nombre: 'Otro', detalle: 'Defines tú las ponderaciones' },
+        { id: 'prob', nombre: 'Probabilidad y Estadística' },
+        { id: 'edo', nombre: 'Ecuaciones Diferenciales' },
+        { id: 'otro', nombre: 'Otro' },
       ];
       // Ajustes del ramo "Otro": ponderaciones, laboratorio y cuántas evaluaciones tiene
       function otroInicial() {
@@ -1114,7 +1112,8 @@
 
       // ---- utilidades ----
       const EPS = 1e-9;
-      const ge = (a, b) => a >= b - EPS;
+      // En la USM, desde 54,5 se redondea a 55: una nota "llega" a un valor desde medio punto antes
+      const ge = (a, b) => a >= b - 0.5 - EPS;
       const prom = (a) => a.reduce((x, y) => x + y, 0) / a.length;
       const fmt = (v, d = 1) => v.toFixed(d).replace('.', ',');
       // Texto → número de 0 a 100; null si está vacío, NaN si no es válido
@@ -1174,7 +1173,7 @@
           globalEtiqueta: 'Nota del global',
           // ¿Ya es seguro que irá a global, aunque falten notas?
           globalSeguro(lo, hi, v) {
-            const bajo40 = ['c1', 'c2', 'c3'].some((k) => v[k] != null && v[k] < 40);
+            const bajo40 = ['c1', 'c2', 'c3'].some((k) => v[k] != null && !ge(v[k], 40));
             return ge(lo.ns, 45) && (!ge(hi.ns, 55) || bajo40);
           },
         },
@@ -1271,7 +1270,7 @@
         RAMOS.forEach((r) => {
           const b = el('button', 'calc-ramo');
           b.type = 'button';
-          b.append(el('strong', '', r.nombre), el('span', '', r.detalle));
+          b.appendChild(el('strong', '', r.nombre));
           b.addEventListener('click', () => elegirRamo(r.id));
           lista.appendChild(b);
         });
