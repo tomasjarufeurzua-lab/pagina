@@ -771,16 +771,23 @@
       return li;
     }
 
-    // Cuenta regresiva a un certamen: aparece al lado del ramo (nombre de la carpeta, como se ve
-    // en la página) y desaparece al pasar el día. Fecha AAAA-MM-DD, hora de Chile.
-    const CERTAMEN = { ramo: 'Ecuaciones Diferenciales', nombre: 'Certamen 2', fecha: '2026-10-05' };
+    // Cuenta regresiva: al lado del ramo (nombre de la carpeta, como se ve en la página) aparece
+    // solo la próxima evaluación; al pasar su día se muestra la siguiente. Fechas AAAA-MM-DD, hora de Chile.
+    const CUENTA_RAMO = 'Ecuaciones Diferenciales';
+    const EVALUACIONES = [
+      { nombre: 'Certamen 2', fecha: '2026-10-05' },
+      { nombre: 'Control 3', fecha: '2026-11-16' },
+      { nombre: 'Certamen 3', fecha: '2026-11-23' },
+    ];
     function textoCuentaRegresiva() {
       const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date());
-      const dias = Math.round((Date.parse(CERTAMEN.fecha) - Date.parse(hoy)) / 86400000);
-      if (dias < 0) return '';
-      if (dias === 0) return 'Hoy es el ' + CERTAMEN.nombre;
-      if (dias === 1) return 'Mañana es el ' + CERTAMEN.nombre;
-      return 'Faltan ' + dias + ' días para el ' + CERTAMEN.nombre;
+      const dias = (e) => Math.round((Date.parse(e.fecha) - Date.parse(hoy)) / 86400000);
+      const proxima = EVALUACIONES.find((e) => dias(e) >= 0);
+      if (!proxima) return '';
+      const d = dias(proxima);
+      if (d === 0) return 'Hoy es el ' + proxima.nombre;
+      if (d === 1) return 'Mañana es el ' + proxima.nombre;
+      return 'Faltan ' + d + ' días para el ' + proxima.nombre;
     }
 
     // Secciones que llevan un punto rojo para que se noten más (nombre de la carpeta, sin tildes cambiadas)
@@ -911,7 +918,7 @@
         punto.setAttribute('aria-label', 'Importante');
         h.prepend(punto);
       }
-      const cuenta = nombre === CERTAMEN.ramo ? textoCuentaRegresiva() : '';
+      const cuenta = nombre === CUENTA_RAMO ? textoCuentaRegresiva() : '';
       if (cuenta) {
         const aviso = document.createElement('span');
         aviso.className = 'cuenta-regresiva';
