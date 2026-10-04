@@ -346,8 +346,8 @@
     .calc-pregunta { margin: 0 0 12px; color: var(--heading); font-weight: 600; }
     .calc-cabeza { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 20px; }
     .calc-cabeza h3 { margin: 0; color: var(--heading); font-size: 1.05rem; }
-    .calc-links { display: flex; gap: 16px; }
-    .calc-link { padding: 0; border: 0; background: none; color: var(--dim); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
+    .calc-links { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+    .calc-link { padding: 0; white-space: nowrap; border: 0; background: none; color: var(--dim); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
     .calc-link:hover { color: var(--accent); }
     .calc-grupo { margin: 0 0 20px; }
     .calc-grupo[hidden] { display: none; }
@@ -355,7 +355,7 @@
     .calc-grupo .calc-nota { margin: 0 0 8px; color: var(--dim); font-size: 0.85rem; }
     .calc-campos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
     .calc-campo label { display: block; margin-bottom: 4px; color: var(--dim); font-size: 0.8rem; }
-    .calc-campo input, .calc-fila input {
+    .calc-campo input {
       width: 100%;
       padding: 8px 10px;
       border: 1px solid rgba(148, 163, 184, 0.3);
@@ -364,20 +364,19 @@
       color: var(--heading);
       font: inherit;
     }
-    .calc-campo input:focus-visible, .calc-fila input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .calc-campo input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
     .calc input.invalido { border-color: #ef4444; }
     .calc-campo.descartado input { text-decoration: line-through; opacity: 0.6; }
     .calc-pista { min-height: 1.2em; margin-top: 4px; font-size: 0.78rem; color: var(--dim); }
     .calc-pista.necesita { color: var(--accent); font-weight: 600; }
-    .calc-filas { display: grid; gap: 8px; margin-bottom: 12px; }
-    .calc-fila { display: grid; gap: 8px; grid-template-columns: 1fr 76px 76px 32px; align-items: center; }
-    .calc-fila .quitar { padding: 4px; border: 0; background: none; color: var(--dim); font-size: 1.1rem; }
-    .calc-fila .quitar:hover { color: #ef4444; }
-    .calc-cols { display: grid; gap: 8px; grid-template-columns: 1fr 76px 76px 32px; margin-bottom: 4px; color: var(--dim); font-size: 0.75rem; }
     .calc-boton { padding: 6px 12px; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 6px; background: none; color: var(--heading); font-size: 0.85rem; }
     .calc-boton:hover { border-color: var(--accent); color: var(--accent); }
-    .calc-pasa { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; }
-    .calc-pasa input { width: 80px; }
+    .calc-editar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .calc-boton.principal { margin-top: 12px; border-color: var(--accent); color: var(--accent); }
+    .calc-radio { display: block; margin: 6px 0; cursor: pointer; }
+    .calc-aviso { margin: 8px 0 0; padding: 10px 12px; border-radius: 6px; background: rgba(245, 158, 11, 0.12); box-shadow: inset 3px 0 0 #f59e0b; font-size: 0.85rem; }
+    .calc-error { margin: 8px 0 0; color: #f87171; font-size: 0.9rem; }
+    .calc-error:empty { display: none; }
     .calc-resultado {
       margin-top: 24px;
       padding: 16px;
@@ -395,7 +394,6 @@
     .calc-resultado.ok { box-shadow: inset 3px 0 0 var(--accent); }
     .calc-resultado.mal { box-shadow: inset 3px 0 0 #ef4444; }
     .calc-resultado.global { box-shadow: inset 3px 0 0 #f59e0b; }
-    @media (max-width: 420px) { .calc-fila, .calc-cols { grid-template-columns: 1fr 64px 64px 28px; } }
     .cuenta-regresiva {
       display: inline-block;
       margin-left: 12px;
@@ -1097,15 +1095,19 @@
       const RAMOS = [
         { id: 'prob', nombre: 'Probabilidad y Estadística', detalle: 'Ponderación del programa' },
         { id: 'edo', nombre: 'Ecuaciones Diferenciales', detalle: '75% certámenes, 25% controles' },
-        { id: 'otro', nombre: 'Otro', detalle: 'Pon tus propias ponderaciones' },
+        { id: 'otro', nombre: 'Otro', detalle: 'Defines tú las ponderaciones' },
       ];
-      const estado = { ramo: null, prob: {}, edo: {}, otro: { pasa: '55', filas: [{}, {}] } };
+      // Ajustes del ramo "Otro": ponderaciones, laboratorio y cuántas evaluaciones tiene
+      function otroInicial() {
+        return { listo: false, pc: '', pk: '', lab: 'no', pl: '', pasa: '55', nc: 1, nk: 1, notas: {} };
+      }
+      const estado = { ramo: null, prob: {}, edo: {}, otro: otroInicial() };
       try {
         const g = JSON.parse(localStorage.getItem(CLAVE));
         if (g && typeof g === 'object') {
           if (RAMOS.some((r) => r.id === g.ramo)) estado.ramo = g.ramo;
           for (const id of ['prob', 'edo']) if (g[id] && typeof g[id] === 'object') estado[id] = g[id];
-          if (g.otro && Array.isArray(g.otro.filas) && g.otro.filas.length) estado.otro = g.otro;
+          if (g.otro && typeof g.otro === 'object' && g.otro.notas && typeof g.otro.notas === 'object') estado.otro = { ...otroInicial(), ...g.otro };
         }
       } catch (e) { /* sin almacenamiento: funciona igual, solo no recuerda */ }
       const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) { /* nada */ } };
@@ -1122,6 +1124,7 @@
         const v = Number(s);
         return Number.isFinite(v) && v >= 0 && v <= 100 ? v : NaN;
       };
+      const fmtN = (v) => String(Math.round(v * 10) / 10).replace('.', ',');
       const el = (tag, clase, texto) => {
         const e = document.createElement(tag);
         if (clase) e.className = clase;
@@ -1233,7 +1236,7 @@
         const borrar = el('button', 'calc-link', 'Borrar notas');
         borrar.type = 'button';
         borrar.addEventListener('click', () => {
-          if (estado.ramo === 'otro') estado.otro = { pasa: estado.otro.pasa, filas: [{}, {}] };
+          if (estado.ramo === 'otro') estado.otro.notas = {};
           else estado[estado.ramo] = {};
           guardar();
           dibujar();
@@ -1241,10 +1244,18 @@
         const cambiar = el('button', 'calc-link', 'Cambiar ramo');
         cambiar.type = 'button';
         cambiar.addEventListener('click', () => elegirRamo(null));
+        if (estado.ramo === 'otro' && estado.otro.listo) {
+          const config = el('button', 'calc-link', 'Cambiar ponderaciones');
+          config.type = 'button';
+          config.addEventListener('click', () => { estado.otro.listo = false; guardar(); dibujar(); });
+          links.appendChild(config);
+        }
         links.append(borrar, cambiar);
         cabeza.appendChild(links);
         cont.appendChild(cabeza);
-        if (estado.ramo === 'otro') dibujarOtro(); else dibujarFijo(MODELOS[estado.ramo], estado[estado.ramo]);
+        if (estado.ramo !== 'otro') dibujarFijo(MODELOS[estado.ramo], estado[estado.ramo]);
+        else if (!estado.otro.listo) dibujarConfigOtro();
+        else dibujarFijo(modeloOtro(), estado.otro.notas);
       }
 
       function dibujarSelector() {
@@ -1294,6 +1305,20 @@
             rejilla.appendChild(campos[clave].caja);
           });
           grupo.appendChild(rejilla);
+          if (g.agregar) {
+            const barra = el('div', 'calc-editar');
+            const mas = el('button', 'calc-boton', '+ Agregar');
+            mas.type = 'button';
+            mas.addEventListener('click', () => { g.agregar(); guardar(); dibujar(); });
+            barra.appendChild(mas);
+            if (g.campos.length > 1) {
+              const menos = el('button', 'calc-boton', '− Quitar el último');
+              menos.type = 'button';
+              menos.addEventListener('click', () => { g.quitar(); guardar(); dibujar(); });
+              barra.appendChild(menos);
+            }
+            grupo.appendChild(barra);
+          }
           cont.appendChild(grupo);
         });
         // Examen global (solo ramos que lo tienen); aparece cuando corresponde
@@ -1354,7 +1379,8 @@
             if (valor !== null) pista.classList.add('necesita');
             resultado.appendChild(el('p', 'grande', texto));
           }
-          if (r.completo) resultado.appendChild(el('p', 'grande', 'NS = ' + fmt(r.ns, 2)));
+          if (r.completo) resultado.appendChild(el('p', 'grande', (m.etiquetaNota || 'NS') + ' = ' + fmt(r.ns, 2)));
+          if (m.extra) { const t = m.extra(v); if (t) resultado.appendChild(el('p', '', t)); }
           if (r.estado) resumenEstado(m, r, v, valores, resultado, campos);
           if (global) global.hidden = r.estado !== 'global';
         }
@@ -1364,6 +1390,7 @@
       // Pastilla y explicación según el estado (reprobado, aprobado o global)
       function resumenEstado(m, r, v, valores, resultado, campos) {
         const conGlobal = !!m.globalSeguro;
+        const pasa = m.pasa != null ? m.pasa : 55;
         const pill = el('span', 'calc-pill');
         const nota = (txt, clase) => resultado.appendChild(el('p', clase || '', txt));
         if (r.estado === 'reprobado') {
@@ -1371,8 +1398,8 @@
           pill.classList.add('mal');
           pill.textContent = conGlobal ? '✕ Reprobación directa' : '✕ Reprobado';
           resultado.prepend(pill);
-          if (r.completo) nota('NF = ' + Math.round(r.ns) + '. ' + (conGlobal ? 'Con NS menor a 45 no hay examen global.' : 'Necesitabas NS de 55 o más.'));
-          else nota('Aun con 100 en lo que falta, no llegas a ' + (conGlobal ? '45' : '55') + '.');
+          if (r.completo) nota('NF = ' + Math.round(r.ns) + '. ' + (conGlobal ? 'Con NS menor a 45 no hay examen global.' : 'Necesitabas ' + (m.etiquetaNota ? '' : 'NS de ') + fmtN(pasa) + ' o más.'));
+          else nota('Aun con 100 en lo que falta, no llegas a ' + fmtN(conGlobal ? 45 : pasa) + '.');
         } else if (r.estado === 'aprobado') {
           resultado.classList.add('ok');
           pill.classList.add('ok');
@@ -1432,99 +1459,147 @@
         }
       }
 
-      // ---- ramo "Otro": notas con su ponderación ----
-      function dibujarOtro() {
+      // ---- ramo "Otro" ----
+      // Paso 1: se pregunta cómo se pondera el ramo. Paso 2: se agregan las evaluaciones y notas.
+      function dibujarConfigOtro() {
         const o = estado.otro;
-        const pasa = el('div', 'calc-pasa');
-        const lp = el('label', '', 'Nota mínima para aprobar');
-        lp.htmlFor = 'calc-otro-pasa';
-        const ip = el('input');
-        ip.id = 'calc-otro-pasa';
-        ip.type = 'text';
-        ip.inputMode = 'decimal';
-        ip.value = o.pasa;
-        ip.addEventListener('input', () => { o.pasa = ip.value; guardar(); actualizar(); });
-        pasa.append(lp, ip);
-        cont.appendChild(pasa);
+        cont.appendChild(el('p', 'calc-pregunta', 'Cuéntame cómo se calcula la nota de tu ramo'));
 
-        const cols = el('div', 'calc-cols');
-        ['Evaluación', 'Nota', 'Peso %', ''].forEach((t) => cols.appendChild(el('span', '', t)));
-        cont.appendChild(cols);
-        const filas = el('div', 'calc-filas');
-        const entradas = o.filas.map((f, i) => {
-          const fila = el('div', 'calc-fila');
-          const mk = (clave, ph, tipo) => {
-            const inp = el('input');
-            inp.type = 'text';
-            if (tipo === 'num') inp.inputMode = 'decimal';
-            inp.placeholder = ph;
-            inp.value = f[clave] || '';
-            inp.setAttribute('aria-label', ph + ' de la fila ' + (i + 1));
-            inp.addEventListener('input', () => { f[clave] = inp.value; guardar(); actualizar(); });
-            return inp;
-          };
-          const nombre = mk('n', 'Nombre', 'txt');
-          const nota = mk('nota', 'Nota', 'num');
-          const peso = mk('peso', '%', 'num');
-          const quitar = el('button', 'quitar', '×');
-          quitar.type = 'button';
-          quitar.setAttribute('aria-label', 'Quitar fila ' + (i + 1));
-          quitar.addEventListener('click', () => {
-            o.filas.splice(i, 1);
-            if (!o.filas.length) o.filas.push({});
+        const grupo = (titulo, nota) => {
+          const g = el('div', 'calc-grupo');
+          g.appendChild(el('h4', '', titulo));
+          if (nota) g.appendChild(el('p', 'calc-nota', nota));
+          cont.appendChild(g);
+          return g;
+        };
+        const entrada = (padre, id, etiqueta, clave, ph) => {
+          const caja = el('div', 'calc-campo');
+          const label = el('label', '', etiqueta);
+          label.htmlFor = id;
+          const inp = el('input');
+          inp.id = id;
+          inp.type = 'text';
+          inp.inputMode = 'decimal';
+          inp.autocomplete = 'off';
+          inp.placeholder = ph;
+          inp.value = o[clave] || '';
+          inp.addEventListener('input', () => { o[clave] = inp.value; guardar(); error.textContent = ''; actualizarSuma(); });
+          caja.append(label, inp);
+          padre.appendChild(caja);
+          return inp;
+        };
+
+        const g1 = grupo('Ponderaciones', 'Cuánto pesa cada parte en la nota. Las notas van de 0 a 100.');
+        const r1 = el('div', 'calc-campos');
+        g1.appendChild(r1);
+        entrada(r1, 'otro-pk', 'Controles (%)', 'pk', 'Ej: 30');
+        entrada(r1, 'otro-pc', 'Certámenes (%)', 'pc', 'Ej: 70');
+
+        const g2 = grupo('Laboratorio');
+        const opciones = [
+          ['no', 'El ramo no tiene laboratorio'],
+          ['pondera', 'Tiene laboratorio y pondera como una nota más'],
+          ['mult', 'Tiene laboratorio y da un multiplicador de 0,9 a 1,1'],
+        ];
+        opciones.forEach(([valor, texto]) => {
+          const l = el('label', 'calc-radio');
+          const r = el('input');
+          r.type = 'radio';
+          r.name = 'otro-lab';
+          r.checked = o.lab === valor;
+          r.addEventListener('change', () => { o.lab = valor; guardar(); dibujar(); });
+          l.append(r, document.createTextNode(' ' + texto));
+          g2.appendChild(l);
+        });
+        if (o.lab === 'pondera') {
+          const r2 = el('div', 'calc-campos');
+          g2.appendChild(r2);
+          entrada(r2, 'otro-pl', 'Laboratorio (%)', 'pl', 'Ej: 10');
+        }
+        if (o.lab === 'mult') {
+          g2.appendChild(el('p', 'calc-aviso', 'Ojo: el multiplicador se asigna de forma lineal con tu nota de laboratorio: un 0 da ×0,9, un 100 da ×1,1 y un 50 da ×1,0 (multiplicador = 0,9 + 0,002 × nota). Se calcula tu nota con controles y certámenes y después se multiplica por ese valor.'));
+        }
+
+        const g3 = grupo('Aprobación');
+        const r3 = el('div', 'calc-campos');
+        g3.appendChild(r3);
+        entrada(r3, 'otro-pasa', 'Nota mínima para aprobar', 'pasa', '55');
+
+        const suma = el('p', 'calc-nota');
+        const error = el('p', 'calc-error');
+        error.setAttribute('role', 'alert');
+        function actualizarSuma() {
+          const partes = [num(o.pk), num(o.pc), o.lab === 'pondera' ? num(o.pl) : 0];
+          const total = partes.reduce((t, x) => t + (x == null || Number.isNaN(x) ? 0 : x), 0);
+          suma.textContent = 'Las ponderaciones suman ' + fmtN(total) + '% (deben sumar 100%).';
+        }
+        const seguir = el('button', 'calc-boton principal', 'Continuar');
+        seguir.type = 'button';
+        seguir.addEventListener('click', () => {
+          const pk = num(o.pk), pc = num(o.pc), pl = o.lab === 'pondera' ? num(o.pl) : 0, pasa = num(o.pasa);
+          const mal = (x) => x == null || Number.isNaN(x);
+          if (mal(pk) || mal(pc) || mal(pl) || pk <= 0 || pc <= 0 || (o.lab === 'pondera' && pl <= 0)) {
+            error.textContent = 'Completa las ponderaciones con números mayores que 0 y hasta 100.';
+          } else if (Math.abs(pk + pc + pl - 100) > 0.01) {
+            error.textContent = 'Las ponderaciones deben sumar 100%; ahora suman ' + fmtN(pk + pc + pl) + '%.';
+          } else if (mal(pasa)) {
+            error.textContent = 'Indica la nota mínima para aprobar (de 0 a 100).';
+          } else {
+            o.listo = true;
             guardar();
             dibujar();
-          });
-          fila.append(nombre, nota, peso, quitar);
-          filas.appendChild(fila);
-          return { f, nota, peso };
+          }
         });
-        cont.appendChild(filas);
-        const agregar = el('button', 'calc-boton', '+ Agregar nota');
-        agregar.type = 'button';
-        agregar.addEventListener('click', () => { o.filas.push({}); guardar(); dibujar(); });
-        cont.appendChild(agregar);
-        const resultado = el('div', 'calc-resultado');
-        resultado.setAttribute('aria-live', 'polite');
-        cont.appendChild(resultado);
+        cont.append(suma, error, seguir);
+        actualizarSuma();
+      }
 
-        function actualizar() {
-          const minimo = num(o.pasa);
-          ip.classList.toggle('invalido', Number.isNaN(minimo));
-          let total = 0, puntos = 0, pesoIngresado = 0, pendiente = 0, invalida = false;
-          entradas.forEach(({ f, nota, peso }) => {
-            const n = num(f.nota), p = num(f.peso);
-            nota.classList.toggle('invalido', Number.isNaN(n));
-            peso.classList.toggle('invalido', Number.isNaN(p));
-            if (Number.isNaN(n) || Number.isNaN(p)) invalida = true;
-            if (p == null || Number.isNaN(p)) return;
-            total += p;
-            if (n == null || Number.isNaN(n)) pendiente += p;
-            else { puntos += p * n; pesoIngresado += p; }
-          });
-          resultado.replaceChildren();
-          resultado.className = 'calc-resultado';
-          if (invalida || Number.isNaN(minimo)) resultado.appendChild(el('p', '', 'Revisa los campos marcados en rojo: deben ir de 0 a 100.'));
-          if (minimo == null || Number.isNaN(minimo) || total <= 0) {
-            if (!invalida && total <= 0) resultado.appendChild(el('p', '', 'Ingresa al menos una nota con su ponderación.'));
-            return;
-          }
-          if (Math.abs(total - 100) > 0.01) resultado.appendChild(el('p', '', 'Ojo: las ponderaciones suman ' + fmt(total) + '%, no 100%. Calculo igual con ese total.'));
-          const nota = (txt, clase) => resultado.appendChild(el('p', clase || '', txt));
-          const pill = (txt, clase) => { const p = el('span', 'calc-pill ' + clase, txt); resultado.classList.add(clase); resultado.prepend(p); };
-          if (pesoIngresado > 0) nota('Por ahora tu promedio es ' + fmt(puntos / pesoIngresado, 2) + ' (' + fmt(pesoIngresado) + '% del total).', 'grande');
-          if (pendiente <= EPS) {
-            const nf = puntos / total;
-            nota('Nota final = ' + fmt(nf, 2) + '.', 'grande');
-            pill(ge(nf, minimo) ? '✓ Aprobado' : '✕ Reprobado', ge(nf, minimo) ? 'ok' : 'mal');
-            return;
-          }
-          const necesito = (minimo * total - puntos) / pendiente;
-          if (necesito > 100 + EPS) { nota('Ni con 100 en lo que falta (' + fmt(pendiente) + '%) llegas a ' + fmt(minimo) + '.', 'grande'); pill('✕ No alcanza', 'mal'); }
-          else if (necesito <= 0) { nota('Ya apruebas con cualquier nota en lo que falta.', 'grande'); pill('✓ Aprobado', 'ok'); }
-          else nota('Necesitas al menos ' + fmt(Math.ceil(necesito * 10 - EPS) / 10) + ' de promedio en lo que falta (' + fmt(pendiente) + '% del total) para llegar a ' + fmt(minimo) + '.', 'grande');
-        }
-        actualizar();
+      // Modelo del ramo "Otro" según lo que se contestó en el paso 1
+      function modeloOtro() {
+        const o = estado.otro;
+        const pk = num(o.pk), pc = num(o.pc), pl = o.lab === 'pondera' ? num(o.pl) : 0;
+        const serie = (pre, etiqueta, n) => Array.from({ length: n }, (_, i) => [pre + (i + 1), etiqueta + ' ' + (i + 1)]);
+        const claves = (pre, n) => Array.from({ length: n }, (_, i) => pre + (i + 1));
+        const mult = (lab) => 0.9 + 0.002 * lab;
+        const lista = (v, pre, n) => claves(pre, n).map((k) => v[k]);
+        const grupos = [
+          {
+            titulo: 'Controles', nota: 'Pesan ' + fmtN(pk) + '%. Agrega todos los que tiene el ramo; los que dejes vacíos cuentan como pendientes.',
+            campos: serie('k', 'Control', o.nk),
+            agregar: () => { o.nk++; },
+            quitar: () => { delete o.notas['k' + o.nk]; o.nk--; },
+          },
+          {
+            titulo: 'Certámenes', nota: 'Pesan ' + fmtN(pc) + '%. Agrega todos los que tiene el ramo; los que dejes vacíos cuentan como pendientes.',
+            campos: serie('c', 'Certamen', o.nc),
+            agregar: () => { o.nc++; },
+            quitar: () => { delete o.notas['c' + o.nc]; o.nc--; },
+          },
+        ];
+        if (o.lab === 'pondera') grupos.push({ titulo: 'Laboratorio', nota: 'Pesa ' + fmtN(pl) + '%.', campos: [['lab', 'Laboratorio']] });
+        if (o.lab === 'mult') grupos.push({ titulo: 'Laboratorio', nota: 'Da un multiplicador lineal: 0 → ×0,9 y 100 → ×1,1.', campos: [['lab', 'Laboratorio']] });
+        const base = (v) => (pk * prom(lista(v, 'k', o.nk)) + pc * prom(lista(v, 'c', o.nc)) + (o.lab === 'pondera' ? pl * v.lab : 0)) / (pk + pc + pl);
+        return {
+          grupos,
+          pasa: num(o.pasa),
+          etiquetaNota: 'Nota final',
+          evaluar(v) {
+            const ns = o.lab === 'mult' ? base(v) * mult(v.lab) : base(v);
+            return { ns, estado: ge(ns, num(o.pasa)) ? 'aprobado' : 'reprobado' };
+          },
+          parcial(v) {
+            const ok = (a) => a.filter((x) => x != null);
+            const ctrl = ok(lista(v, 'k', o.nk)), cert = ok(lista(v, 'c', o.nc));
+            const partes = [[pk, ctrl.length ? prom(ctrl) : null], [pc, cert.length ? prom(cert) : null]];
+            if (o.lab === 'pondera') partes.push([pl, v.lab]);
+            const b = promedioPonderado(partes);
+            return b != null && o.lab === 'mult' && v.lab != null ? b * mult(v.lab) : b;
+          },
+          extra(v) {
+            if (o.lab !== 'mult' || v.lab == null) return '';
+            return 'Multiplicador de laboratorio: ×' + (0.9 + 0.002 * v.lab).toFixed(3).replace('.', ',') + ' (por tu nota de ' + fmtN(v.lab) + ').';
+          },
+        };
       }
 
       dibujar();
