@@ -1145,6 +1145,8 @@
             if (!ge(ns, 45)) return { ns, estado: 'reprobado' };
             return { ns, estado: ge(ns, 55) && cert.every((c) => ge(c, 40)) ? 'aprobado' : 'global' };
           },
+          globalTitulo: 'Examen global',
+          globalEtiqueta: 'Nota del global',
           // ¿Ya es seguro que irá a global, aunque falten notas?
           globalSeguro(lo, hi, v) {
             const bajo40 = ['c1', 'c2', 'c3'].some((k) => v[k] != null && v[k] < 40);
@@ -1156,10 +1158,16 @@
             { titulo: 'Certámenes', campos: [['c1', 'Certamen 1'], ['c2', 'Certamen 2'], ['c3', 'Certamen 3']] },
             { titulo: 'Controles', campos: [['k1', 'Control 1'], ['k2', 'Control 2'], ['k3', 'Control 3']] },
           ],
+          // Si se rinde el certamen global, su nota reemplaza al peor certamen
           evaluar(v) {
-            const ns = 0.75 * prom([v.c1, v.c2, v.c3]) + 0.25 * prom([v.k1, v.k2, v.k3]);
+            const cert = [v.c1, v.c2, v.c3];
+            if (v.g != null) cert[cert.indexOf(Math.min(...cert))] = v.g;
+            const ns = 0.75 * prom(cert) + 0.25 * prom([v.k1, v.k2, v.k3]);
             return { ns, estado: ge(ns, 55) ? 'aprobado' : 'reprobado' };
           },
+          globalTitulo: 'Certamen global',
+          globalEtiqueta: 'Nota del certamen global',
+          reemplazaPeor: true,
         },
       };
 
@@ -1168,12 +1176,12 @@
       function analizar(m, v) {
         const claves = m.grupos.flatMap((g) => g.campos.map((c) => c[0]));
         const faltan = claves.filter((k) => v[k] == null);
-        const rellenar = (x) => { const r = { ...v }; faltan.forEach((k) => { r[k] = x; }); return r; };
+        const rellenar = (x) => { const r = { ...v, g: null }; faltan.forEach((k) => { r[k] = x; }); return r; };
         const lo = m.evaluar(rellenar(0));
         const hi = m.evaluar(rellenar(100));
         const res = { faltan, completo: !faltan.length, ns: faltan.length ? null : lo.ns, estado: null, necesita: null };
         if (res.completo) { res.estado = lo.estado; return res; }
-        if (hi.estado === 'reprobado') res.estado = 'reprobado';
+        if (hi.estado === 'reprobado' && !m.reemplazaPeor) res.estado = 'reprobado';
         else if (m.globalSeguro && m.globalSeguro(lo, hi, v)) res.estado = 'global';
         if (!res.estado && faltan.length === 1) {
           let minimo = null;
@@ -1269,12 +1277,12 @@
         });
         // Examen global (solo ramos que lo tienen); aparece cuando corresponde
         let global = null;
-        if (m.globalSeguro) {
+        if (m.globalTitulo) {
           const grupo = el('div', 'calc-grupo');
           grupo.hidden = true;
-          grupo.appendChild(el('h4', '', 'Examen global'));
+          grupo.appendChild(el('h4', '', m.globalTitulo));
           const rejilla = el('div', 'calc-campos');
-          campos.g = campo('g', 'Nota del global', valores, actualizar);
+          campos.g = campo('g', m.globalEtiqueta, valores, actualizar);
           rejilla.appendChild(campos.g.caja);
           grupo.appendChild(rejilla);
           cont.appendChild(grupo);
@@ -1297,6 +1305,7 @@
             v[k] = Number.isNaN(n) ? null : n;
           });
           const r = analizar(m, v);
+          if (m.reemplazaPeor && r.completo && r.estado === 'reprobado') r.estado = 'global';
           resultado.replaceChildren();
           resultado.className = 'calc-resultado';
           if (hayInvalida) resultado.appendChild(el('p', '', 'Revisa las notas marcadas en rojo: deben ir de 0 a 100.'));
@@ -1315,7 +1324,7 @@
             const pista = campos[clave].pista;
             const etiqueta = m.grupos.flatMap((g) => g.campos).find((c) => c[0] === clave)[1];
             let texto;
-            if (valor === null) texto = 'Ya no alcanzas a aprobar directo, ni con 100 en ' + etiqueta + '.';
+            if (valor === null) texto = 'Ya no alcanzas a aprobar directo, ni con 100 en ' + etiqueta + '.' + (m.reemplazaPeor ? ' Te quedaría rendir el certamen global.' : '');
             else if (valor === 0) texto = 'Ya aprobaste: con cualquier nota en ' + etiqueta + ' apruebas.';
             else texto = 'Necesitas al menos ' + fmt(valor) + ' en ' + etiqueta + ' para aprobar.';
             pista.textContent = valor === null ? 'No alcanza' : valor === 0 ? 'Cualquier nota' : 'Necesitas ≥ ' + fmt(valor);
@@ -1356,6 +1365,7 @@
             nota('Ya vas a global. Cuando ingreses todas las notas te digo cuánto necesitas.');
             return;
           }
+          if (m.reemplazaPeor) return resumenCertamenGlobal(m, r, v, valores, resultado, campos);
           const sobre55 = ge(r.ns, 55);
           nota(sobre55
             ? 'Tienes una prueba escrita bajo 40, así que debes rendir el examen global. Si no lo rindes, NF = 54 (reprobado).'
@@ -1376,6 +1386,26 @@
             const nf = Math.round(0.6 * r.ns + 0.4 * g);
             nota('Con ' + fmt(g) + ' en el global: NF = ' + nf + (nf >= 55 ? ' → Aprobado.' : ' → Reprobado.'), 'grande');
           }
+        }
+      }
+
+      // EDO: la nota del certamen global reemplaza al peor certamen y se recalcula NS
+      function resumenCertamenGlobal(m, r, v, valores, resultado, campos) {
+        const nota = (txt, clase) => resultado.appendChild(el('p', clase || '', txt));
+        const cert = ['c1', 'c2', 'c3'];
+        const peor = cert.reduce((a, b) => (v[b] < v[a] ? b : a));
+        const numPeor = peor.slice(1);
+        nota('Con NS = ' + fmt(r.ns, 2) + ' no apruebas directo. Puedes rendir el certamen global: su nota reemplaza a tu peor certamen (Certamen ' + numPeor + ', con ' + fmt(v[peor]) + ') y se vuelve a calcular NS.');
+        let minimo = null;
+        for (let i = 0; i <= 1000 && minimo === null; i++) {
+          if (m.evaluar({ ...v, g: i / 10 }).estado === 'aprobado') minimo = i / 10;
+        }
+        if (minimo === null) { nota('Ni con 100 en el certamen global llegas a 55.', 'grande'); campos.g.pista.textContent = 'No alcanza'; }
+        else { nota('Necesitas al menos ' + fmt(minimo) + ' en el certamen global para aprobar.', 'grande'); campos.g.pista.textContent = 'Necesitas ≥ ' + fmt(minimo); campos.g.pista.classList.add('necesita'); }
+        const g = num(valores.g);
+        if (g != null && !Number.isNaN(g)) {
+          const f = m.evaluar({ ...v, g });
+          nota('Con ' + fmt(g) + ' en el global: NS = ' + fmt(f.ns, 2) + ', NF = ' + Math.round(f.ns) + (f.estado === 'aprobado' ? ' → Aprobado.' : ' → Reprobado.'), 'grande');
         }
       }
 
