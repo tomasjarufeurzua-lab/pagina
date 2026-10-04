@@ -789,7 +789,7 @@
         { nombre: 'Certamen 3', fecha: '2026-11-26' },
       ],
     };
-    // Devuelve el texto de la cuenta regresiva en varias versiones, de la más larga a la más corta,
+    // Devuelve el texto de la cuenta regresiva en cuatro versiones, de la más larga a la más corta,
     // para poder elegir la que cabe en pantalla.
     function textosCuentaRegresiva(ramo) {
       const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date());
@@ -797,29 +797,40 @@
       const proxima = (EVALUACIONES[ramo] || []).find((e) => dias(e) >= 0);
       if (!proxima) return null;
       const d = dias(proxima);
-      if (d === 0) return ['Hoy es el ' + proxima.nombre, 'Hoy: ' + proxima.nombre, 'Hoy'];
-      if (d === 1) return ['Mañana es el ' + proxima.nombre, 'Mañana: ' + proxima.nombre, 'Mañana'];
+      if (d === 0) return ['Hoy es el ' + proxima.nombre, 'Hoy: ' + proxima.nombre, 'Hoy', 'Hoy'];
+      if (d === 1) return ['Mañana es el ' + proxima.nombre, 'Mañana: ' + proxima.nombre, 'Mañana', 'Mañana'];
       return ['Faltan ' + d + ' días para el ' + proxima.nombre, d + ' días para ' + proxima.nombre, 'Faltan ' + d + ' días', d + ' días'];
     }
 
-    // Deja en cada etiqueta la versión más larga que cabe en la misma línea que el título del ramo.
-    // Si ni la más corta cabe, queda la más corta, en su propia línea debajo del título.
+    // Todas las etiquetas usan siempre la misma versión (larga, media, corta o mínima): la más
+    // larga con la que todas caben en la misma línea que el título de su ramo. Si ni la mínima
+    // cabe, las que no caben van en su propia línea debajo del título.
     function ajustarCuentas() {
-      document.querySelectorAll('.cuenta-regresiva').forEach((aviso) => {
-        const textos = JSON.parse(aviso.dataset.textos);
+      const avisos = [...document.querySelectorAll('.cuenta-regresiva')].map((aviso) => {
         const h = aviso.parentNode;
         const rango = document.createRange();
         rango.selectNodeContents([...h.childNodes].find((n) => n.nodeType === 3));
-        const cabe = () => {
-          const lineas = rango.getClientRects();
-          const ultima = lineas[lineas.length - 1];
-          return !ultima || aviso.getBoundingClientRect().top < ultima.bottom - 1;
-        };
         aviso.classList.remove('sola');
-        const entra = textos.some((texto) => { aviso.textContent = texto; return cabe(); });
-        if (!entra) aviso.classList.add('sola');
+        return { aviso, rango, textos: JSON.parse(aviso.dataset.textos) };
       });
+      const cabe = ({ aviso, rango }) => {
+        const lineas = rango.getClientRects();
+        const ultima = lineas[lineas.length - 1];
+        return !ultima || aviso.getBoundingClientRect().top < ultima.bottom - 1;
+      };
+      const ponerNivel = (n) => avisos.forEach((x) => { x.aviso.textContent = x.textos[Math.min(n, x.textos.length - 1)]; });
+      const niveles = Math.max(0, ...avisos.map((x) => x.textos.length));
+      let nivel = 0;
+      for (; nivel < niveles; nivel++) {
+        ponerNivel(nivel);
+        if (avisos.every(cabe)) break;
+      }
+      if (nivel === niveles) {
+        ponerNivel(niveles - 1);
+        avisos.filter((x) => !cabe(x)).forEach((x) => x.aviso.classList.add('sola'));
+      }
     }
+
     // Se vuelve a ajustar cuando cambia el ancho de la lista (giro del celular, ventana) y cuando
     // terminan de cargar las tipografías, que cambian el ancho del texto.
     new ResizeObserver(ajustarCuentas).observe(caja);
