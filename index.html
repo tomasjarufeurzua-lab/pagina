@@ -19,7 +19,7 @@
   <meta property="og:image:alt" content="Tomás Jarufe Urzúa, estudiante de Ingeniería Civil Industrial en la USM">
   <meta property="og:locale" content="es_CL">
   <meta name="twitter:card" content="summary_large_image">
-  <!-- Estadísticas de visitas (GoatCounter: sin cookies, no guarda IPs) -->
+  <!-- Estadisticas de visitas (GoatCounter: sin cookies, no guarda IPs) -->
   <script data-goatcounter="https://tomasjarufe.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -468,7 +468,7 @@
     .files .arrow { color: var(--dim); transition: transform 0.2s; }
     .files a:hover .arrow { transform: translateY(2px); color: var(--accent); }
 
-    /* Íconos repetidos al final: solo en celular y tablet, donde los de arriba quedan lejos */
+    /* Iconos repetidos al final: solo en celular y tablet, donde los de arriba quedan lejos */
     .footer-social { margin-top: 16px; }
 
     footer { font-size: 0.85rem; color: var(--dim); max-width: 420px; padding-bottom: 32px; }
@@ -528,6 +528,60 @@
       .social { margin-top: 20px; }
     }
 
+    /* Celular y tablet: al entrar solo se ve el inicio; el menu plegable abre cada seccion */
+    .menu-btn, .menu-movil { display: none; }
+    @media (max-width: 1023px) {
+      .menu-btn {
+        position: fixed;
+        top: 11px;
+        left: 12px;
+        z-index: 60;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+        background: rgba(46, 49, 53, 0.92);
+        backdrop-filter: blur(8px);
+        color: var(--heading);
+        cursor: pointer;
+      }
+      .menu-btn:hover, .menu-btn:focus-visible { border-color: var(--accent); outline: none; }
+      .menu-btn svg { width: 20px; height: 20px; }
+      .menu-btn .cerrar, .menu-btn[aria-expanded="true"] .abrir { display: none; }
+      .menu-btn[aria-expanded="true"] .cerrar { display: block; }
+      .menu-movil {
+        position: fixed;
+        top: 59px;
+        left: 12px;
+        z-index: 59;
+        display: block;
+        min-width: 220px;
+        max-width: calc(100vw - 24px);
+        padding: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 12px;
+        background: rgba(46, 49, 53, 0.98);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+      }
+      .menu-movil[hidden] { display: none; }
+      .menu-movil ul { list-style: none; margin: 0; padding: 0; }
+      .menu-movil a { display: block; padding: 10px 14px; border-radius: 8px; color: var(--text); font-weight: 500; }
+      .menu-movil a:hover, .menu-movil a:focus-visible { background: var(--card-hover); color: var(--heading); outline: none; }
+      .menu-movil a.actual { color: var(--accent); background: var(--accent-bg); }
+      .sec-title { padding-left: 68px; }
+      body.movil main { display: none; }
+      body.movil.con-seccion main { display: block; }
+      body.movil main section { display: none; }
+      body.movil main section.visible { display: block; }
+      body.movil.con-seccion .wrap { padding-bottom: 24px; }
+    }
+
+    @media (max-width: 767px) { .wrap { padding-top: 72px; } }
+
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       * { transition: none !important; }
@@ -537,7 +591,7 @@
     /* Al imprimir sale como un CV en blanco y negro */
     @media print {
       :root { --bg: #fff; --text: #333; --heading: #000; --dim: #555; --accent: #000; --accent-bg: #eee; }
-      .spotlight, nav.toc, .social, .cta, .go-material, footer, #material, #calculadora { display: none !important; }
+      .spotlight, nav.toc, .social, .cta, .go-material, footer, #material, #calculadora, .menu-btn, .menu-movil { display: none !important; }
       .wrap { display: block; padding: 0; }
       .side, main { width: auto; position: static; padding: 0; max-height: none; }
       .side { margin-bottom: 24px; }
@@ -550,6 +604,12 @@
 </head>
 <body>
   <div class="spotlight" id="spotlight"></div>
+
+  <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu-movil" aria-label="Menú de secciones">
+    <svg class="abrir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <svg class="cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <nav class="menu-movil" id="menu-movil" aria-label="Secciones" hidden><ul></ul></nav>
 
   <div class="wrap">
     <header class="side">
@@ -751,8 +811,8 @@
 
   <script>
     // Columna izquierda en computador: si no cabe de alto (notebooks con la
-    // pantalla ampliada), se desplaza con la página hasta mostrarse completa
-    // y recién ahí se queda fija. Así nunca aparece una segunda barra de scroll.
+    // pantalla ampliada), se desplaza con la pagina hasta mostrarse completa
+    // y recien ahi se queda fija. Asi nunca aparece una segunda barra de scroll.
     const lateral = document.querySelector('.side');
     function ajustarLateral() {
       lateral.style.top = innerWidth >= 1024 ? Math.min(0, innerHeight - lateral.offsetHeight) + 'px' : '';
@@ -767,7 +827,7 @@
       spot.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, var(--spot), transparent 80%)`;
     });
 
-    // Marca en el menú la sección que se está viendo
+    // Marca en el menu la seccion que se esta viendo
     const links = document.querySelectorAll('nav.toc a');
     const sections = [...document.querySelectorAll('main section')];
     function markActive() {
@@ -783,7 +843,7 @@
     window.addEventListener('scroll', markActive, { passive: true });
     markActive();
 
-    // Lista automáticamente los archivos subidos a la carpeta material/.
+    // Lista automaticamente los archivos subidos a la carpeta material/.
     // Cada carpeta dentro de material/ aparece como un grupo con el nombre de la carpeta.
     // Si cambias el nombre del repositorio o la rama publicada, actualiza estos valores.
     const usuario = 'tomasjarufeurzua-lab';
@@ -792,7 +852,7 @@
     const caja = document.getElementById('material-list');
 
     // "Mi_archivo - parte-1.pdf" → "Mi archivo — parte 1"
-    // Un número al inicio ("1 - Resumen.pdf") sirve para ordenar y no se muestra.
+    // Un numero al inicio ("1 - Resumen.pdf") sirve para ordenar y no se muestra.
     function titulo(nombre) {
       return nombre.replace(/^\d+\s*-\s+/, '').replace(/\s+-\s+/g, ' — ').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
     }
@@ -846,8 +906,8 @@
       return li;
     }
 
-    // Cuenta regresiva: al lado del ramo (nombre de la carpeta, como se ve en la página) aparece
-    // solo la próxima evaluación; al pasar su día se muestra la siguiente.
+    // Cuenta regresiva: al lado del ramo (nombre de la carpeta, como se ve en la pagina) aparece
+    // solo la proxima evaluacion; al pasar su dia se muestra la siguiente.
     // Fechas AAAA-MM-DD, hora de Chile, en orden.
     const EVALUACIONES = {
       'Ecuaciones Diferenciales': [
@@ -862,7 +922,7 @@
         { nombre: 'Certamen 3', fecha: '2026-11-26' },
       ],
     };
-    // Devuelve el texto de la cuenta regresiva en cuatro versiones, de la más larga a la más corta,
+    // Devuelve el texto de la cuenta regresiva en cuatro versiones, de la mas larga a la mas corta,
     // para poder elegir la que cabe en pantalla.
     function textosCuentaRegresiva(ramo) {
       const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date());
@@ -875,9 +935,9 @@
       return ['Faltan ' + d + ' días para el ' + proxima.nombre, d + ' días para ' + proxima.nombre, 'Faltan ' + d + ' días', d + ' días'];
     }
 
-    // Todas las etiquetas usan siempre la misma versión (larga, media, corta o mínima): la más
-    // larga con la que todas caben en la misma línea que el título de su ramo. Si ni la mínima
-    // cabe, las que no caben van en su propia línea debajo del título.
+    // Todas las etiquetas usan siempre la misma version (larga, media, corta o minima): la mas
+    // larga con la que todas caben en la misma linea que el titulo de su ramo. Si ni la minima
+    // cabe, las que no caben van en su propia linea debajo del titulo.
     function ajustarCuentas() {
       const avisos = [...document.querySelectorAll('.cuenta-regresiva')].map((aviso) => {
         const h = aviso.parentNode;
@@ -905,22 +965,22 @@
     }
 
     // Se vuelve a ajustar cuando cambia el ancho de la lista (giro del celular, ventana) y cuando
-    // terminan de cargar las tipografías, que cambian el ancho del texto.
+    // terminan de cargar las tipografias, que cambian el ancho del texto.
     new ResizeObserver(ajustarCuentas).observe(caja);
     if (document.fonts) document.fonts.addEventListener('loadingdone', ajustarCuentas);
     window.addEventListener('load', ajustarCuentas);
 
-    // Secciones que llevan un punto rojo para que se noten más (nombre de la carpeta, sin tildes cambiadas)
+    // Secciones que llevan un punto rojo para que se noten mas (nombre de la carpeta, sin tildes cambiadas)
     const DESTACADOS = ['Ayudantía Laboratorio Álgebra Lineal'];
 
     // Archivos que se destacan con la etiqueta "Importante" y un fondo verde
-    // (título tal como se ve en la página, sin el número inicial)
+    // (titulo tal como se ve en la pagina, sin el numero inicial)
     const ARCHIVOS_IMPORTANTES = ['Ejercicios de práctica 1 para el Control 1 (Mathematica)'];
 
-    // Archivos que se destacan en rojo con la etiqueta "Más difícil" (nombre del archivo, con su número inicial)
+    // Archivos que se destacan en rojo con la etiqueta "Mas dificil" (nombre del archivo, con su numero inicial)
     const ARCHIVOS_DIFICILES = ['3 - Ensayo Certamen 2'];
 
-    // Subsecciones que se pueden plegar (nombre de la carpeta, sin el número inicial)
+    // Subsecciones que se pueden plegar (nombre de la carpeta, sin el numero inicial)
     const PLEGABLES = ['Control 2 — Ensayos', 'Resumen'];
 
     function visible(ruta) {
@@ -959,11 +1019,11 @@
     }
 
     // Un grupo por carpeta. Los archivos sueltos van primero y cada
-    // subcarpeta aparece como un subtítulo con sus propios archivos.
+    // subcarpeta aparece como un subtitulo con sus propios archivos.
     // Dibuja lo que hay en un nivel de carpetas: primero los archivos sueltos y luego
-    // cada subcarpeta (que puede tener más subcarpetas dentro). Se ordena con el nombre
-    // real de la carpeta (puede llevar un número al inicio, como "1 - Laboratorio") y se
-    // muestra sin ese número.
+    // cada subcarpeta (que puede tener mas subcarpetas dentro). Se ordena con el nombre
+    // real de la carpeta (puede llevar un numero al inicio, como "1 - Laboratorio") y se
+    // muestra sin ese numero.
     function dibujarNivel(contenedor, lista, nivel) {
       const directos = [];
       const subcarpetas = new Map();
@@ -974,8 +1034,8 @@
         if (!subcarpetas.has(sub)) subcarpetas.set(sub, []);
         subcarpetas.get(sub).push(ruta);
       }
-      // Archivos y carpetas se ordenan juntos. Con número al inicio ("1 - ...") van según el
-      // número; sin número, los archivos van primero y las carpetas después.
+      // Archivos y carpetas se ordenan juntos. Con numero al inicio ("1 - ...") van segun el
+      // numero; sin numero, los archivos van primero y las carpetas despues.
       const elementos = [
         ...directos.map((ruta) => ({ tipo: 'archivo', nombre: ruta.split('/').pop().replace(/\.[^.]+$/, ''), ruta })),
         ...[...subcarpetas.keys()].map((sub) => ({ tipo: 'carpeta', nombre: sub, rutas: subcarpetas.get(sub) })),
@@ -999,7 +1059,7 @@
         const nombreSub = titulo(e.nombre);
         const archivosSub = e.rutas;
         if (PLEGABLES.includes(nombreSub)) {
-          // Subsección plegable: empieza cerrada y muestra cuántos archivos tiene
+          // Subseccion plegable: empieza cerrada y muestra cuantos archivos tiene
           const bloque = document.createElement('details');
           bloque.className = 'subgroup plegable';
           const resumen = document.createElement('summary');
@@ -1051,10 +1111,10 @@
     }
 
     // Lista de rutas de todo lo que hay en material/. Primero usa material.json,
-    // que GitHub Pages genera al publicar; si no está, le pregunta a la API de GitHub.
-    // material.json también trae la fecha de la última publicación: se agrega a los enlaces
-    // (?v=...) para que, si reemplazas un PDF, a todos les descargue la versión nueva y no
-    // la que el navegador tenía guardada.
+    // que GitHub Pages genera al publicar; si no esta, le pregunta a la API de GitHub.
+    // material.json tambien trae la fecha de la ultima publicacion: se agrega a los enlaces
+    // (?v=...) para que, si reemplazas un PDF, a todos les descargue la version nueva y no
+    // la que el navegador tenia guardada.
     let versionMaterial = '';
     async function todasLasRutas() {
       try {
@@ -1094,7 +1154,7 @@
         { id: 'edo', nombre: 'Ecuaciones Diferenciales' },
         { id: 'otro', nombre: 'Otro' },
       ];
-      // Ajustes del ramo "Otro": ponderaciones, laboratorio y cuántas evaluaciones tiene
+      // Ajustes del ramo "Otro": ponderaciones, laboratorio y cuantas evaluaciones tiene
       function otroInicial() {
         return { listo: false, pc: '', pk: '', lab: 'no', pl: '', desc: '0', nc: 1, nk: 1, notas: {} };
       }
@@ -1106,7 +1166,7 @@
       const ge = (a, b) => a >= b - 0.5 - EPS;
       const prom = (a) => a.reduce((x, y) => x + y, 0) / a.length;
       const fmt = (v, d = 1) => v.toFixed(d).replace('.', ',');
-      // Texto → número de 0 a 100; null si está vacío, NaN si no es válido
+      // Texto → numero de 0 a 100; null si esta vacio, NaN si no es valido
       const num = (t) => {
         const s = String(t == null ? '' : t).trim().replace(',', '.');
         if (s === '') return null;
@@ -1128,13 +1188,13 @@
         return con.reduce((t, [w, x]) => t + w * x, 0) / con.reduce((t, [w]) => t + w, 0);
       }
 
-      // Claves de los n peores controles, cuando ya están todos ingresados (si no, ninguno)
+      // Claves de los n peores controles, cuando ya estan todos ingresados (si no, ninguno)
       function peoresControles(v, claves, n) {
         if (n < 1 || claves.length <= n || claves.some((k) => v[k] == null)) return [];
         return claves.map((k, i) => [k, i]).sort((a, b) => v[a[0]] - v[b[0]] || a[1] - b[1]).slice(0, n).map((x) => x[0]);
       }
 
-      // ---- ramos con ponderación fija ----
+      // ---- ramos con ponderacion fija ----
       // evaluar recibe todas las notas y devuelve la nota semestral (ns) y su estado.
       const MODELOS = {
         prob: {
@@ -1161,7 +1221,7 @@
           descartados: (v) => peoresControles(v, ['k1', 'k2', 'k3', 'k4'], 1),
           globalTitulo: 'Examen global',
           globalEtiqueta: 'Nota del global',
-          // ¿Ya es seguro que irá a global, aunque falten notas?
+          // Ya es seguro que ira a global, aunque falten notas?
           globalSeguro(lo, hi, v) {
             const bajo40 = ['c1', 'c2', 'c3'].some((k) => v[k] != null && !ge(v[k], 40));
             return ge(lo.ns, 45) && (!ge(hi.ns, 55) || bajo40);
@@ -1191,8 +1251,8 @@
         },
       };
 
-      // Analiza las notas ingresadas: qué falta, si el resultado ya está decidido y, si falta
-      // una sola nota, cuál es la mínima para aprobar directo.
+      // Analiza las notas ingresadas: que falta, si el resultado ya esta decidido y, si falta
+      // una sola nota, cual es la minima para aprobar directo.
       function analizar(m, v) {
         const claves = m.grupos.flatMap((g) => g.campos.map((c) => c[0]));
         const faltan = claves.filter((k) => v[k] == null);
@@ -1352,7 +1412,7 @@
           resultado.className = 'calc-resultado';
           if (hayInvalida) resultado.appendChild(el('p', '', 'Revisa las notas marcadas en rojo: deben ir de 0 a 100.'));
 
-          // Controles descartados: se marcan cuando ya están todos los controles
+          // Controles descartados: se marcan cuando ya estan todos los controles
           if (m.descartados) {
             m.descartados(v).forEach((k) => {
               campos[k].caja.classList.add('descartado');
@@ -1390,12 +1450,12 @@
         actualizar();
       }
 
-      // La nota no puede pasar de 100: si te pasas, se avisa cuánto tienes en realidad
+      // La nota no puede pasar de 100: si te pasas, se avisa cuanto tienes en realidad
       function avisoTope(resultado, nota) {
         if (nota > 100 + EPS) resultado.appendChild(el('p', '', 'En realidad tienes ' + fmt(nota, 2) + ', pero el ramo solo se puede pasar con 100 😂'));
       }
 
-      // Pastilla y explicación según el estado (reprobado, aprobado o global)
+      // Pastilla y explicacion segun el estado (reprobado, aprobado o global)
       function resumenEstado(m, r, v, valores, resultado, campos) {
         const conGlobal = !!m.globalSeguro;
         const pasa = 55;
@@ -1468,7 +1528,7 @@
       }
 
       // ---- ramo "Otro" ----
-      // Paso 1: se pregunta cómo se pondera el ramo. Paso 2: se agregan las evaluaciones y notas.
+      // Paso 1: se pregunta como se pondera el ramo. Paso 2: se agregan las evaluaciones y notas.
       function dibujarConfigOtro() {
         const o = estado.otro;
         cont.appendChild(el('p', 'calc-pregunta', 'Cuéntame cómo se calcula la nota de tu ramo'));
@@ -1567,7 +1627,7 @@
         actualizarSuma();
       }
 
-      // Modelo del ramo "Otro" según lo que se contestó en el paso 1
+      // Modelo del ramo "Otro" segun lo que se contesto en el paso 1
       function modeloOtro() {
         const o = estado.otro;
         const pk = num(o.pk), pc = num(o.pc), pl = o.lab === 'pondera' ? num(o.pl) : 0;
@@ -1576,7 +1636,7 @@
         const mult = (lab) => 0.9 + 0.002 * lab;
         const lista = (v, pre, n) => claves(pre, n).map((k) => v[k]);
         const desc = Number(o.desc) || 0;
-        // Promedio de controles; si ya están todos, se quitan los peores
+        // Promedio de controles; si ya estan todos, se quitan los peores
         const promControles = (lst) => {
           const orden = lst.slice().sort((a, b) => b - a);
           return prom(lst.length === o.nk && o.nk > desc ? orden.slice(0, o.nk - desc) : orden);
@@ -1622,6 +1682,84 @@
       }
 
       dibujar();
+    })();
+  </script>
+  <script>
+    // Menu plegable para celular y tablet: al entrar solo se ve el inicio (hasta el boton de
+    // apuntes y material). Cada opcion del menu muestra su seccion y deja las demas ocultas.
+    (function () {
+      const movil = window.matchMedia('(max-width: 1023px)');
+      const boton = document.getElementById('menu-btn');
+      const menu = document.getElementById('menu-movil');
+      const lista = menu.querySelector('ul');
+      const secciones = [...document.querySelectorAll('main section')];
+
+      // Las opciones salen del menu de escritorio, mas una para volver al inicio
+      const opciones = [['inicio', 'Inicio']];
+      document.querySelectorAll('nav.toc a').forEach((a) => opciones.push([a.getAttribute('href').slice(1), a.textContent.trim()]));
+      opciones.forEach(([id, texto]) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#' + id;
+        a.textContent = texto;
+        a.dataset.id = id;
+        li.appendChild(a);
+        lista.appendChild(li);
+      });
+
+      function abrirMenu(abrir) {
+        menu.hidden = !abrir;
+        boton.setAttribute('aria-expanded', String(abrir));
+      }
+
+      // Muestra la seccion de la URL (#id); sin seccion valida se ve solo el inicio
+      function mostrar(desplazar) {
+        const id = location.hash.slice(1);
+        const actual = secciones.find((s) => s.id === id);
+        if (movil.matches) {
+          secciones.forEach((s) => s.classList.toggle('visible', s === actual));
+          document.body.classList.toggle('con-seccion', !!actual);
+          lista.querySelectorAll('a').forEach((a) => a.classList.toggle('actual', a.dataset.id === (actual ? actual.id : 'inicio')));
+        }
+        if (desplazar && movil.matches) {
+          if (actual) actual.scrollIntoView();
+          else window.scrollTo(0, 0);
+        }
+      }
+
+      function aplicar() {
+        document.body.classList.toggle('movil', movil.matches);
+        if (!movil.matches) {
+          abrirMenu(false);
+          document.body.classList.remove('con-seccion');
+          secciones.forEach((s) => s.classList.remove('visible'));
+        } else {
+          mostrar(false);
+        }
+      }
+
+      boton.addEventListener('click', (e) => { e.stopPropagation(); abrirMenu(menu.hidden); });
+      menu.addEventListener('click', (e) => {
+        const a = e.target.closest('a');
+        if (!a) return;
+        abrirMenu(false);
+        // Si ya estamos en esa direccion no hay cambio de URL: se muestra igual
+        if (a.dataset.id === 'inicio') {
+          e.preventDefault();
+          history.pushState(null, '', location.pathname + location.search);
+          mostrar(true);
+        } else if (location.hash === '#' + a.dataset.id) {
+          e.preventDefault();
+          mostrar(true);
+        }
+      });
+      document.addEventListener('click', (e) => { if (!menu.hidden && !menu.contains(e.target)) abrirMenu(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { abrirMenu(false); boton.focus(); } });
+      window.addEventListener('hashchange', () => mostrar(true));
+      window.addEventListener('popstate', () => mostrar(true));
+      movil.addEventListener('change', aplicar);
+      aplicar();
+      if (movil.matches && location.hash) requestAnimationFrame(() => mostrar(true));
     })();
   </script>
 </body>
