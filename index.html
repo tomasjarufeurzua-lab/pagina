@@ -1099,7 +1099,7 @@
       ];
       // Ajustes del ramo "Otro": ponderaciones, laboratorio y cuántas evaluaciones tiene
       function otroInicial() {
-        return { listo: false, pc: '', pk: '', lab: 'no', pl: '', pasa: '55', nc: 1, nk: 1, notas: {} };
+        return { listo: false, pc: '', pk: '', lab: 'no', pl: '', pasa: '55', desc: '0', nc: 1, nk: 1, notas: {} };
       }
       const estado = { ramo: null, prob: {}, edo: {}, otro: otroInicial() };
       try {
@@ -1139,6 +1139,12 @@
         return con.reduce((t, [w, x]) => t + w * x, 0) / con.reduce((t, [w]) => t + w, 0);
       }
 
+      // Claves de los n peores controles, cuando ya están todos ingresados (si no, ninguno)
+      function peoresControles(v, claves, n) {
+        if (n < 1 || claves.length <= n || claves.some((k) => v[k] == null)) return [];
+        return claves.map((k, i) => [k, i]).sort((a, b) => v[a[0]] - v[b[0]] || a[1] - b[1]).slice(0, n).map((x) => x[0]);
+      }
+
       // ---- ramos con ponderación fija ----
       // evaluar recibe todas las notas y devuelve la nota semestral (ns) y su estado.
       const MODELOS = {
@@ -1163,6 +1169,7 @@
             if (ctrl.length === 4) ctrl = ctrl.sort((a, b) => b - a).slice(0, 3);
             return promedioPonderado([[0.75, cert.length ? prom(cert) : null], [0.15, ctrl.length ? prom(ctrl) : null], [0.10, v.lab]]);
           },
+          descartados: (v) => peoresControles(v, ['k1', 'k2', 'k3', 'k4'], 1),
           globalTitulo: 'Examen global',
           globalEtiqueta: 'Nota del global',
           // ¿Ya es seguro que irá a global, aunque falten notas?
@@ -1356,11 +1363,12 @@
           resultado.className = 'calc-resultado';
           if (hayInvalida) resultado.appendChild(el('p', '', 'Revisa las notas marcadas en rojo: deben ir de 0 a 100.'));
 
-          // Control descartado (Probabilidad): el peor de los 4, cuando ya están todos
-          if (m === MODELOS.prob && ['k1', 'k2', 'k3', 'k4'].every((k) => v[k] != null)) {
-            const peor = ['k1', 'k2', 'k3', 'k4'].reduce((a, b) => (v[b] < v[a] ? b : a));
-            campos[peor].caja.classList.add('descartado');
-            campos[peor].pista.textContent = 'Descartado';
+          // Controles descartados: se marcan cuando ya están todos los controles
+          if (m.descartados) {
+            m.descartados(v).forEach((k) => {
+              campos[k].caja.classList.add('descartado');
+              campos[k].pista.textContent = 'Descartado';
+            });
           }
           if (!r.completo) {
             const parcial = m.parcial(v);
@@ -1495,6 +1503,18 @@
         entrada(r1, 'otro-pk', 'Controles (%)', 'pk', 'Ej: 30');
         entrada(r1, 'otro-pc', 'Certámenes (%)', 'pc', 'Ej: 70');
 
+        const gd = grupo('Controles descartados', 'Si el ramo descarta tus peores controles, no cuentan en el promedio (cuando ya están todos los controles).');
+        [['0', 'No se descarta ninguno'], ['1', 'Se descarta el peor control'], ['2', 'Se descartan los 2 peores controles']].forEach(([valor, texto]) => {
+          const l = el('label', 'calc-radio');
+          const r = el('input');
+          r.type = 'radio';
+          r.name = 'otro-desc';
+          r.checked = o.desc === valor;
+          r.addEventListener('change', () => { o.desc = valor; guardar(); });
+          l.append(r, document.createTextNode(' ' + texto));
+          gd.appendChild(l);
+        });
+
         const g2 = grupo('Laboratorio');
         const opciones = [
           ['no', 'El ramo no tiene laboratorio'],
@@ -1562,9 +1582,15 @@
         const claves = (pre, n) => Array.from({ length: n }, (_, i) => pre + (i + 1));
         const mult = (lab) => 0.9 + 0.002 * lab;
         const lista = (v, pre, n) => claves(pre, n).map((k) => v[k]);
+        const desc = Number(o.desc) || 0;
+        // Promedio de controles; si ya están todos, se quitan los peores
+        const promControles = (lst) => {
+          const orden = lst.slice().sort((a, b) => b - a);
+          return prom(lst.length === o.nk && o.nk > desc ? orden.slice(0, o.nk - desc) : orden);
+        };
         const grupos = [
           {
-            titulo: 'Controles', nota: 'Pesan ' + fmtN(pk) + '%. Agrega todos los que tiene el ramo; los que dejes vacíos cuentan como pendientes.',
+            titulo: 'Controles', nota: 'Pesan ' + fmtN(pk) + '%.' + (desc ? ' Se descarta' + (desc === 1 ? ' el peor.' : 'n los ' + desc + ' peores.') : '') + ' Agrega todos los que tiene el ramo; los que dejes vacíos cuentan como pendientes.',
             campos: serie('k', 'Control', o.nk),
             agregar: () => { o.nk++; },
             quitar: () => { delete o.notas['k' + o.nk]; o.nk--; },
@@ -1578,11 +1604,12 @@
         ];
         if (o.lab === 'pondera') grupos.push({ titulo: 'Laboratorio', nota: 'Pesa ' + fmtN(pl) + '%.', campos: [['lab', 'Laboratorio']] });
         if (o.lab === 'mult') grupos.push({ titulo: 'Laboratorio', nota: 'Da un multiplicador lineal: 0 → ×0,9 y 100 → ×1,1.', campos: [['lab', 'Laboratorio']] });
-        const base = (v) => (pk * prom(lista(v, 'k', o.nk)) + pc * prom(lista(v, 'c', o.nc)) + (o.lab === 'pondera' ? pl * v.lab : 0)) / (pk + pc + pl);
+        const base = (v) => (pk * promControles(lista(v, 'k', o.nk)) + pc * prom(lista(v, 'c', o.nc)) + (o.lab === 'pondera' ? pl * v.lab : 0)) / (pk + pc + pl);
         return {
           grupos,
           pasa: num(o.pasa),
           etiquetaNota: 'Nota final',
+          descartados: (v) => peoresControles(v, claves('k', o.nk), desc),
           evaluar(v) {
             const ns = o.lab === 'mult' ? base(v) * mult(v.lab) : base(v);
             return { ns, estado: ge(ns, num(o.pasa)) ? 'aprobado' : 'reprobado' };
@@ -1590,7 +1617,7 @@
           parcial(v) {
             const ok = (a) => a.filter((x) => x != null);
             const ctrl = ok(lista(v, 'k', o.nk)), cert = ok(lista(v, 'c', o.nc));
-            const partes = [[pk, ctrl.length ? prom(ctrl) : null], [pc, cert.length ? prom(cert) : null]];
+            const partes = [[pk, ctrl.length ? promControles(ctrl) : null], [pc, cert.length ? prom(cert) : null]];
             if (o.lab === 'pondera') partes.push([pl, v.lab]);
             const b = promedioPonderado(partes);
             return b != null && o.lab === 'mult' && v.lab != null ? b * mult(v.lab) : b;
