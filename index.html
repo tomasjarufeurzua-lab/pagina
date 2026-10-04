@@ -1694,9 +1694,16 @@
       const lista = menu.querySelector('ul');
       const secciones = [...document.querySelectorAll('main section')];
 
-      // Las opciones salen del menu de escritorio, mas una para volver al inicio
+      // Secciones que se muestran juntas bajo una misma opcion del menu
+      const PAGINAS = { 'sobre-mi': ['sobre-mi', 'experiencia', 'educacion', 'logros', 'habilidades'] };
+      const paginaDe = (id) => Object.keys(PAGINAS).find((k) => PAGINAS[k].includes(id)) || id;
+
+      // Opciones: inicio y una por pagina (los nombres salen del menu de escritorio)
       const opciones = [['inicio', 'Inicio']];
-      document.querySelectorAll('nav.toc a').forEach((a) => opciones.push([a.getAttribute('href').slice(1), a.textContent.trim()]));
+      document.querySelectorAll('nav.toc a').forEach((a) => {
+        const id = a.getAttribute('href').slice(1);
+        if (paginaDe(id) === id) opciones.push([id, a.textContent.trim()]);
+      });
       opciones.forEach(([id, texto]) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
@@ -1716,10 +1723,11 @@
       function mostrar(desplazar) {
         const id = location.hash.slice(1);
         const actual = secciones.find((s) => s.id === id);
+        const pagina = actual ? paginaDe(actual.id) : null;
         if (movil.matches) {
-          secciones.forEach((s) => s.classList.toggle('visible', s === actual));
+          secciones.forEach((s) => s.classList.toggle('visible', !!pagina && paginaDe(s.id) === pagina));
           document.body.classList.toggle('con-seccion', !!actual);
-          lista.querySelectorAll('a').forEach((a) => a.classList.toggle('actual', a.dataset.id === (actual ? actual.id : 'inicio')));
+          lista.querySelectorAll('a').forEach((a) => a.classList.toggle('actual', a.dataset.id === (pagina || 'inicio')));
         }
         if (desplazar && movil.matches) {
           if (actual) actual.scrollIntoView();
