@@ -722,7 +722,7 @@
 
       <section id="calculadora">
         <h2 class="sec-title">Calculadora de promedio</h2>
-        <p>Elige tu ramo, ingresa las notas que ya tienes y te muestro cómo vas y qué nota necesitas. Las notas se guardan solo en tu navegador. Se redondea como en la USM: desde 54,5 cuenta como 55.</p>
+        <p>Elige tu ramo, ingresa las notas que ya tienes y te muestro cómo vas y qué nota necesitas. Las notas no se guardan: al salir o recargar la página se borran. Se redondea como en la USM: desde 54,5 cuenta como 55.</p>
         <div id="calc" class="calc"></div>
       </section>
 
@@ -1087,9 +1087,8 @@
     });
   </script>
   <script>
-    // Calculadora de promedio. Las notas van de 0 a 100 y se guardan solo en el navegador.
+    // Calculadora de promedio. Las notas van de 0 a 100 y no se guardan: al recargar se parte de cero.
     (function () {
-      const CLAVE = 'calculadora-promedio';
       const RAMOS = [
         { id: 'prob', nombre: 'Probabilidad y Estadística' },
         { id: 'edo', nombre: 'Ecuaciones Diferenciales' },
@@ -1100,15 +1099,6 @@
         return { listo: false, pc: '', pk: '', lab: 'no', pl: '', desc: '0', nc: 1, nk: 1, notas: {} };
       }
       const estado = { ramo: null, prob: {}, edo: {}, otro: otroInicial() };
-      try {
-        const g = JSON.parse(localStorage.getItem(CLAVE));
-        if (g && typeof g === 'object') {
-          if (RAMOS.some((r) => r.id === g.ramo)) estado.ramo = g.ramo;
-          for (const id of ['prob', 'edo']) if (g[id] && typeof g[id] === 'object') estado[id] = g[id];
-          if (g.otro && typeof g.otro === 'object' && g.otro.notas && typeof g.otro.notas === 'object') estado.otro = { ...otroInicial(), ...g.otro };
-        }
-      } catch (e) { /* sin almacenamiento: funciona igual, solo no recuerda */ }
-      const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) { /* nada */ } };
 
       // ---- utilidades ----
       const EPS = 1e-9;
@@ -1228,7 +1218,7 @@
 
       function elegirRamo(id) {
         estado.ramo = id;
-        guardar();
+       
         dibujar();
       }
 
@@ -1244,7 +1234,7 @@
         borrar.addEventListener('click', () => {
           if (estado.ramo === 'otro') estado.otro.notas = {};
           else estado[estado.ramo] = {};
-          guardar();
+         
           dibujar();
         });
         const cambiar = el('button', 'calc-link', 'Cambiar ramo');
@@ -1253,7 +1243,7 @@
         if (estado.ramo === 'otro' && estado.otro.listo) {
           const config = el('button', 'calc-link', 'Cambiar ponderaciones');
           config.type = 'button';
-          config.addEventListener('click', () => { estado.otro.listo = false; guardar(); dibujar(); });
+          config.addEventListener('click', () => { estado.otro.listo = false; dibujar(); });
           links.appendChild(config);
         }
         links.append(borrar, cambiar);
@@ -1291,7 +1281,7 @@
         input.value = valores[clave] || '';
         input.addEventListener('input', () => {
           valores[clave] = input.value;
-          guardar();
+         
           alCambiar();
         });
         const pista = el('div', 'calc-pista');
@@ -1315,12 +1305,12 @@
             const barra = el('div', 'calc-editar');
             const mas = el('button', 'calc-boton', '+ Agregar');
             mas.type = 'button';
-            mas.addEventListener('click', () => { g.agregar(); guardar(); dibujar(); });
+            mas.addEventListener('click', () => { g.agregar(); dibujar(); });
             barra.appendChild(mas);
             if (g.campos.length > 1) {
               const menos = el('button', 'calc-boton', '− Quitar el último');
               menos.type = 'button';
-              menos.addEventListener('click', () => { g.quitar(); guardar(); dibujar(); });
+              menos.addEventListener('click', () => { g.quitar(); dibujar(); });
               barra.appendChild(menos);
             }
             grupo.appendChild(barra);
@@ -1490,7 +1480,7 @@
           inp.autocomplete = 'off';
           inp.placeholder = ph;
           inp.value = o[clave] || '';
-          inp.addEventListener('input', () => { o[clave] = inp.value; guardar(); error.textContent = ''; actualizarSuma(); });
+          inp.addEventListener('input', () => { o[clave] = inp.value; error.textContent = ''; actualizarSuma(); });
           caja.append(label, inp);
           padre.appendChild(caja);
           return inp;
@@ -1509,7 +1499,7 @@
           r.type = 'radio';
           r.name = 'otro-desc';
           r.checked = o.desc === valor;
-          r.addEventListener('change', () => { o.desc = valor; guardar(); });
+          r.addEventListener('change', () => { o.desc = valor; });
           l.append(r, document.createTextNode(' ' + texto));
           gd.appendChild(l);
         });
@@ -1526,7 +1516,7 @@
           r.type = 'radio';
           r.name = 'otro-lab';
           r.checked = o.lab === valor;
-          r.addEventListener('change', () => { o.lab = valor; guardar(); dibujar(); });
+          r.addEventListener('change', () => { o.lab = valor; dibujar(); });
           l.append(r, document.createTextNode(' ' + texto));
           g2.appendChild(l);
         });
@@ -1558,7 +1548,7 @@
             error.textContent = 'Las ponderaciones deben sumar 100%; ahora suman ' + fmtN(pk + pc + pl) + '%.';
           } else {
             o.listo = true;
-            guardar();
+           
             dibujar();
           }
         });
