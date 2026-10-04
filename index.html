@@ -772,17 +772,25 @@
     }
 
     // Cuenta regresiva: al lado del ramo (nombre de la carpeta, como se ve en la página) aparece
-    // solo la próxima evaluación; al pasar su día se muestra la siguiente. Fechas AAAA-MM-DD, hora de Chile.
-    const CUENTA_RAMO = 'Ecuaciones Diferenciales';
-    const EVALUACIONES = [
-      { nombre: 'Certamen 2', fecha: '2026-10-05' },
-      { nombre: 'Control 3', fecha: '2026-11-16' },
-      { nombre: 'Certamen 3', fecha: '2026-11-23' },
-    ];
-    function textoCuentaRegresiva() {
+    // solo la próxima evaluación; al pasar su día se muestra la siguiente.
+    // Fechas AAAA-MM-DD, hora de Chile, en orden.
+    const EVALUACIONES = {
+      'Ecuaciones Diferenciales': [
+        { nombre: 'Certamen 2', fecha: '2026-10-05' },
+        { nombre: 'Control 3', fecha: '2026-11-16' },
+        { nombre: 'Certamen 3', fecha: '2026-11-23' },
+      ],
+      'Probabilidad y Estadística': [
+        { nombre: 'Control 3', fecha: '2026-10-22' },
+        { nombre: 'Certamen 2', fecha: '2026-10-29' },
+        { nombre: 'Control 4', fecha: '2026-11-12' },
+        { nombre: 'Certamen 3', fecha: '2026-11-26' },
+      ],
+    };
+    function textoCuentaRegresiva(ramo) {
       const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date());
       const dias = (e) => Math.round((Date.parse(e.fecha) - Date.parse(hoy)) / 86400000);
-      const proxima = EVALUACIONES.find((e) => dias(e) >= 0);
+      const proxima = (EVALUACIONES[ramo] || []).find((e) => dias(e) >= 0);
       if (!proxima) return '';
       const d = dias(proxima);
       if (d === 0) return 'Hoy es el ' + proxima.nombre;
@@ -918,7 +926,7 @@
         punto.setAttribute('aria-label', 'Importante');
         h.prepend(punto);
       }
-      const cuenta = nombre === CUENTA_RAMO ? textoCuentaRegresiva() : '';
+      const cuenta = textoCuentaRegresiva(nombre);
       if (cuenta) {
         const aviso = document.createElement('span');
         aviso.className = 'cuenta-regresiva';
