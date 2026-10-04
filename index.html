@@ -1717,15 +1717,16 @@
       const lista = menu.querySelector('ul');
       const secciones = [...document.querySelectorAll('main section')];
 
-      // Secciones que se ven en cada opcion del menu. Desde Material tambien se ve la
-      // calculadora (esta abajo), pero desde la calculadora no se ve el material.
+      // Secciones que se ven en cada opcion del menu: Sobre mi termina con el material, Material
+      // termina con la calculadora, y la calculadora se ve sola.
+      const SOBRE_MI = ['sobre-mi', 'experiencia', 'educacion', 'logros', 'habilidades'];
       const PAGINAS = {
-        'sobre-mi': ['sobre-mi', 'experiencia', 'educacion', 'logros', 'habilidades'],
+        'sobre-mi': [...SOBRE_MI, 'material'],
         material: ['material', 'calculadora'],
         calculadora: ['calculadora'],
       };
       // A que opcion del menu pertenece una seccion (los enlaces a experiencia, logros, etc. abren Sobre mi)
-      const paginaDe = (id) => (PAGINAS['sobre-mi'].includes(id) ? 'sobre-mi' : id);
+      const paginaDe = (id) => (SOBRE_MI.includes(id) ? 'sobre-mi' : id);
 
       // Opciones: inicio y una por pagina (los nombres salen del menu de escritorio)
       const opciones = [['inicio', 'Inicio']];
